@@ -22,7 +22,7 @@ services:
     container_name: asistencia_app
     restart: always
     ports:
-      - "8080:8080"
+      - "8081:8081"  # <-- CAMBIADO A 8081 PARA COINCIDIR CON TU SPRING BOOT
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/asistencia
       SPRING_DATASOURCE_USERNAME: postgres
