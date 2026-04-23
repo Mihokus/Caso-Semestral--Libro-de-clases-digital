@@ -35,64 +35,54 @@ public class MensajeService {
                 .build();
 
         Mensaje guardado = mensajeRepository.save(mensaje);
-        return mapToResponse(guardado);
+        MensajeResponse response = mensajeRepository.findMensajeDTOById(guardado.getId());
+
+        if (response == null) {
+            throw new ResourceNotFoundException("Mensaje no encontrado con id: " + guardado.getId());
+        }
+
+        return response;
     }
 
     public List<MensajeResponse> listarMensajes() {
-        return mensajeRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        return mensajeRepository.findAllMensajesDTO();
     }
 
     public MensajeResponse obtenerPorId(Long id) {
-        Mensaje mensaje = mensajeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Mensaje no encontrado con id: " + id));
-        return mapToResponse(mensaje);
+        MensajeResponse response = mensajeRepository.findMensajeDTOById(id);
+        if (response == null) {
+            throw new ResourceNotFoundException("Mensaje no encontrado con id: " + id);
+        }
+        return response;
     }
 
     public List<MensajeResponse> obtenerPorDestinatario(Long destinatarioId) {
-        return mensajeRepository.findByDestinatarioId(destinatarioId)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        return mensajeRepository.findMensajesDTOByDestinatarioId(destinatarioId);
     }
 
     public List<MensajeResponse> obtenerPorRemitente(Long remitenteId) {
-        return mensajeRepository.findByRemitenteId(remitenteId)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        return mensajeRepository.findMensajesDTOByRemitenteId(remitenteId);
     }
 
     public MensajeResponse marcarComoLeido(Long id) {
         Mensaje mensaje = mensajeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Mensaje no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Mensaje no encontrado con id: " + id));
 
         mensaje.setEstado(EstadoMensaje.LEIDO);
-        Mensaje actualizado = mensajeRepository.save(mensaje);
+        mensajeRepository.save(mensaje);
 
-        return mapToResponse(actualizado);
+        MensajeResponse response = mensajeRepository.findMensajeDTOById(id);
+        if (response == null) {
+            throw new ResourceNotFoundException("Mensaje no encontrado con id: " + id);
+        }
+
+        return response;
     }
 
     public void eliminarMensaje(Long id) {
         if (!mensajeRepository.existsById(id)) {
-    throw new ResourceNotFoundException("Mensaje no encontrado con id: " + id);
-}
+            throw new ResourceNotFoundException("Mensaje no encontrado con id: " + id);
+        }
         mensajeRepository.deleteById(id);
-    }
-
-    private MensajeResponse mapToResponse(Mensaje mensaje) {
-        return MensajeResponse.builder()
-                .id(mensaje.getId())
-                .titulo(mensaje.getTitulo())
-                .contenido(mensaje.getContenido())
-                .remitenteNombre(mensaje.getRemitenteNombre())
-                .destinatarioNombre(mensaje.getDestinatarioNombre())
-                .tipoMensaje(mensaje.getTipoMensaje())
-                .destinatarioTipo(mensaje.getDestinatarioTipo())
-                .estado(mensaje.getEstado())
-                .fechaEnvio(mensaje.getFechaEnvio())
-                .build();
     }
 }
