@@ -13,16 +13,16 @@ public class AcademicController{
     @Autowired
     private AcademicFacade academicFacade;
 
-    @PostMapping("/registrarNotas");
+    @PostMapping("/registrarNotas")
     public ResponseEntity<Evaluacion> registrarNota(@RequestBody EvaluacionDTO dto){
         Evaluacion nuevaNota = academicFacade.registrarNota(
-            dto.getAsignaturaId();
-            dto.getNombre();
-            dto.getNota();
+            dto.getAsignaturaId(),
+            dto.getNombre(),
+            dto.getNota()
         );
         return ResponseEntity.ok(nuevaNota);
     }
-    
+
     @GetMapping("/rendimiento/{asignaturaId}")
     public ResponseEntity<Double> obtenerRendimiento(@PathVariable Long asignaturaId) {
         Double promedio = academicFacade.obtenerPromedioRendimiento(asignaturaId);
