@@ -31,5 +31,15 @@ public class AcademicFacadeImpl implements AcademicFacade{
 
         return notas.stream().mapToDouble(Evaluacion::getNota).average().orElse(0.0);
     }
+    
+    @Override
+    public Asignatura guardarAsignatura(Asignatura asignatura) {
+        return asigRepo.save(asignatura);
+    }
+
+    @Override
+    public List<Asignatura> listarAsignaturas() {
+        return asigRepo.findAll();
+    }
 
 }
