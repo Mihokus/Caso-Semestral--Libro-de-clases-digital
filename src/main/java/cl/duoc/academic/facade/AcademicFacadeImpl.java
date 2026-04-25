@@ -19,17 +19,17 @@ public class AcademicFacadeImpl implements AcademicFacade{
         nueva.setNombre(nombre);
         nueva.setNota(nota);
 
-        return evaluacionRepo.save(nueva);
+        return evalRepo.save(nueva);
     }
 
     @Override
     public Double obtenerPromedioRendimiento (Long asignaturaId){
-        List<Evaluacion> notas = evaluacionRepo.findByAsignaturaId(asignaturaId);
+        List<Evaluacion> notas = evalRepo.findByAsignaturaId(asignaturaId);
 
         if(notas.isEmpty()) 
             return 0.0;
 
-        return notas.stream()..mapToDouble(Evaluacion::getNota).average().orElse(0.0);
+        return notas.stream().mapToDouble(Evaluacion::getNota).average().orElse(0.0);
     }
 
 }

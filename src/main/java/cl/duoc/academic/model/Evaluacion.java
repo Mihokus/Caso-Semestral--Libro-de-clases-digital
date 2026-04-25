@@ -8,7 +8,7 @@ public class Evaluacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nombreEvaluacion;
+    private String nombre;
     private Double nota;
     private Double ponderacion;
     @ManyToOne
