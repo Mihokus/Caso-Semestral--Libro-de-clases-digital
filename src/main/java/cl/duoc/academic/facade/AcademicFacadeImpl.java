@@ -10,14 +10,18 @@ public class AcademicFacadeImpl implements AcademicFacade{
     @Autowired private EvaluacionRepository evalRepo;
 
     @Override
-    public Evaluacion registrarNota(Long asignaturaId, String nombre, Double nota){
+    public Evaluacion registrarNota(Long asignaturaId,Long alumnoId,String nombre, Double nota, Double ponderacion){
         Asignatura asig = asigRepo.findById(asignaturaId)
         .orElseThrow(() -> new RuntimeException("Asignatura no encontrada"));
 
         Evaluacion nueva = new Evaluacion();
         nueva.setAsignatura(asig);
+        nueva.setAlumnoId(alumnoId);
         nueva.setNombre(nombre);
         nueva.setNota(nota);
+        nueva.setPonderacion(ponderacion);
+        
+        
 
         return evalRepo.save(nueva);
     }

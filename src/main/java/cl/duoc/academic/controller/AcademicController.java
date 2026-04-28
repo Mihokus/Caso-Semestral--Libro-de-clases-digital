@@ -20,8 +20,10 @@ public class AcademicController{
     public ResponseEntity<Evaluacion> registrarNota(@RequestBody EvaluacionDTO dto){
         Evaluacion nuevaNota = academicFacade.registrarNota(
             dto.getAsignaturaId(),
+            dto.getAlumnoId(),
             dto.getNombre(),
-            dto.getNota()
+            dto.getNota(),
+            dto.getPonderacion()
         );
         return ResponseEntity.ok(nuevaNota);
     }
