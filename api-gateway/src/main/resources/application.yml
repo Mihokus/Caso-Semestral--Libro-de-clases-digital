@@ -6,23 +6,25 @@ spring:
     name: api-gateway
   cloud:
     gateway:
-      routes:
-        - id: auth-service
-          uri: http://auth-service:8082
-          predicates:
-            - Path=/auth/**
-        - id: asistencia
-          uri: http://asistencia-app:8081
-          predicates:
-            - Path=/api/alumnos/**,/api/asistencia/**,/api/anotaciones/**
-        - id: mensajeria
-          uri: http://mensajeria-app:8083
-          predicates:
-            - Path=/api/mensajes/**
-        - id: academic
-          uri: http://academic-service:8084
-          predicates:
-            - Path=/api/academica/**
+      server:
+        webflux:
+          routes:
+            - id: auth-service
+              uri: http://auth-service:8082
+              predicates:
+                - Path=/auth/**
+            - id: asistencia
+              uri: http://asistencia-app:8081
+              predicates:
+                - Path=/api/alumnos/**,/api/asistencia/**,/api/anotaciones/**
+            - id: mensajeria
+              uri: http://mensajeria-app:8083
+              predicates:
+                - Path=/api/mensajes/**
+            - id: academic
+              uri: http://academic-service:8084
+              predicates:
+                - Path=/api/academica/**
 
 management:
   endpoints:
