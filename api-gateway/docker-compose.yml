@@ -28,6 +28,7 @@ services:
       DB_URL: jdbc:postgresql://gateway-db:5432/gateway_db
       DB_USER: postgres
       DB_PASS: postgres
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
     restart: unless-stopped
 
 volumes:
