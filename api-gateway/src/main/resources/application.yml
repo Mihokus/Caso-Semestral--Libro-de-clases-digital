@@ -27,18 +27,10 @@ spring:
       server:
         webmvc:
           routes:
-            - id: asistencia
-              uri: http://asistencia-app:8081
+            - id: bff
+              uri: ${BFF_URL:http://bff:8085}
               predicates:
-                - Path=/api/alumnos/**,/api/asistencia/**,/api/anotaciones/**
-            - id: mensajeria
-              uri: http://mensajeria-app:8083
-              predicates:
-                - Path=/api/mensajes/**
-            - id: academic
-              uri: http://academic-service:8084
-              predicates:
-                - Path=/api/academica/**
+                - Path=/api/alumnos/**,/api/cursos/**,/api/asistencia/**,/api/anotaciones/**,/api/mensajes/**,/api/asignaturas/**,/api/academica/**,/api/notas/**,/api/dashboard
 
 jwt:
   secret: ${JWT_SECRET:dev-secret-change-me-this-needs-to-be-at-least-32-bytes-long-for-hs256}
