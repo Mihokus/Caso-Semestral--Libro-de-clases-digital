@@ -10,6 +10,9 @@ spring:
 asistencia:
   url: ${ASISTENCIA_URL:http://asistencia-app:8081}
 
+mensajeria:
+  url: ${MENSAJERIA_URL:http://mensajeria-app:8083}
+
 management:
   endpoints:
     web:
