@@ -7,12 +7,8 @@ spring:
   cloud:
     gateway:
       server:
-        webflux:
+        webmvc:
           routes:
-            - id: auth-service
-              uri: http://auth-service:8082
-              predicates:
-                - Path=/auth/**
             - id: asistencia
               uri: http://asistencia-app:8081
               predicates:
@@ -25,9 +21,6 @@ spring:
               uri: http://academic-service:8084
               predicates:
                 - Path=/api/academica/**
-
-jwt:
-  secret: ${JWT_SECRET:dev-secret-change-me-this-needs-to-be-at-least-32-bytes-long-for-hs256}
 
 management:
   endpoints:
