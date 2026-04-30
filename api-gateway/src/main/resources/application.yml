@@ -37,6 +37,10 @@ spring:
               predicates:
                 - Path=/api/academica/**
 
+jwt:
+  secret: ${JWT_SECRET:dev-secret-change-me-this-needs-to-be-at-least-32-bytes-long-for-hs256}
+  expiration: ${JWT_EXPIRATION_MS:86400000}
+
 management:
   endpoints:
     web:
