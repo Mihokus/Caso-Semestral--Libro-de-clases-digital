@@ -1,0 +1,14 @@
+server:
+  port: ${SERVER_PORT:8085}
+
+spring:
+  application:
+    name: bff
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

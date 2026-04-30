@@ -1,0 +1,10 @@
+services:
+  bff:
+    build: .
+    container_name: bff
+    ports:
+      - "8085:8085"
+    environment:
+      SERVER_PORT: 8085
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+    restart: unless-stopped
