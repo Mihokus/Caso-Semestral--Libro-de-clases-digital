@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 
 @Entity
@@ -13,7 +12,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Anotacion {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,7 +20,7 @@ public class Anotacion {
     private String rutEstudiante;
 
     @Column(nullable = false)
-    private String tipo; // Ejemplo: "POSITIVA", "NEGATIVA"
+    private String tipo;
 
     @Column(columnDefinition = "TEXT")
     private String descripcion;
