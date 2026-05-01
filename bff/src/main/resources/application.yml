@@ -13,6 +13,9 @@ asistencia:
 mensajeria:
   url: ${MENSAJERIA_URL:http://mensajeria-app:8083}
 
+academica:
+  url: ${ACADEMICA_URL:http://academic-service:8084}
+
 management:
   endpoints:
     web:
