@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: postgres:16-alpine
@@ -10,6 +12,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
+      # Esto permite que los datos sobrevivan si apagas el contenedor
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -22,8 +25,9 @@ services:
     container_name: asistencia_app
     restart: always
     ports:
-      - "8081:8081"  # <-- CAMBIADO A 8081 PARA COINCIDIR CON TU SPRING BOOT
+      - "8081:8081"
     environment:
+      # Variables que sobrescriben application.properties para entorno Docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/asistencia
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
