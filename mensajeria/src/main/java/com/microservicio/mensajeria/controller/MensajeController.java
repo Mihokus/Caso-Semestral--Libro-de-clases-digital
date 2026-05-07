@@ -19,46 +19,48 @@ public class MensajeController {
         this.mensajeriaFacade = mensajeriaFacade;
     }
 
-    @PostMapping("/comunicado")
+    // Caso de uso: publicar mensajes masivos a la comunidad educativa
+    @PostMapping("/difusion")
     @ResponseStatus(HttpStatus.CREATED)
-    public MensajeResponse publicarComunicado(@RequestBody MensajeRequest request) {
-        return mensajeriaFacade.publicarComunicado(request);
+    public MensajeResponse publicarMensajeDifusion(@RequestBody MensajeRequest request) {
+        return mensajeriaFacade.publicarMensajeDifusion(request);
     }
 
-    @PostMapping("/directo")
+    // Caso de uso: enviar comunicación directa entre usuarios
+    @PostMapping("/conversacion/directa")
     @ResponseStatus(HttpStatus.CREATED)
-    public MensajeResponse enviarMensajeDirecto(@RequestBody MensajeRequest request) {
-        return mensajeriaFacade.enviarMensajeDirecto(request);
+    public MensajeResponse enviarComunicacionDirecta(@RequestBody MensajeRequest request) {
+        return mensajeriaFacade.enviarComunicacionDirecta(request);
     }
 
-    @GetMapping
-    public List<MensajeResponse> listarMensajes() {
-        return mensajeriaFacade.listarTodos();
+    // Caso de uso: bandeja general de un usuario
+    @GetMapping("/bandeja/{usuarioId}")
+    public List<MensajeResponse> obtenerBandejaUsuario(@PathVariable Long usuarioId) {
+        return mensajeriaFacade.obtenerBandejaUsuario(usuarioId);
     }
 
-    @GetMapping("/{id}")
-    public MensajeResponse obtenerMensaje(@PathVariable Long id) {
-        return mensajeriaFacade.obtenerMensaje(id);
+    // Caso de uso: historial de mensajes enviados por un usuario
+    @GetMapping("/historial/{usuarioId}")
+    public List<MensajeResponse> obtenerHistorialUsuario(@PathVariable Long usuarioId) {
+        return mensajeriaFacade.obtenerHistorialUsuario(usuarioId);
     }
 
-    @GetMapping("/destinatario/{destinatarioId}")
-    public List<MensajeResponse> obtenerPorDestinatario(@PathVariable Long destinatarioId) {
-        return mensajeriaFacade.obtenerMensajesPorDestinatario(destinatarioId);
+    // Caso de uso: detalle de un mensaje específico
+    @GetMapping("/detalle/{mensajeId}")
+    public MensajeResponse obtenerDetalleMensaje(@PathVariable Long mensajeId) {
+        return mensajeriaFacade.obtenerDetalleMensaje(mensajeId);
     }
 
-    @GetMapping("/remitente/{remitenteId}")
-    public List<MensajeResponse> obtenerPorRemitente(@PathVariable Long remitenteId) {
-        return mensajeriaFacade.obtenerMensajesPorRemitente(remitenteId);
+    // Caso de uso: registrar lectura del mensaje
+    @PutMapping("/{mensajeId}/registrar-lectura")
+    public MensajeResponse registrarLecturaMensaje(@PathVariable Long mensajeId) {
+        return mensajeriaFacade.registrarLecturaMensaje(mensajeId);
     }
 
-    @PutMapping("/{id}/leido")
-    public MensajeResponse marcarComoLeido(@PathVariable Long id) {
-        return mensajeriaFacade.marcarMensajeComoLeido(id);
-    }
-
-    @DeleteMapping("/{id}")
+    // Caso de uso: archivar o eliminar mensaje
+    @DeleteMapping("/{mensajeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminarMensaje(@PathVariable Long id) {
-        mensajeriaFacade.eliminarMensaje(id);
+    public void eliminarMensaje(@PathVariable Long mensajeId) {
+        mensajeriaFacade.eliminarMensaje(mensajeId);
     }
 }
