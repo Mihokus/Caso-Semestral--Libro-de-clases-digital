@@ -25,9 +25,12 @@ public class Mensaje {
 
     private Long remitenteId;
     private String remitenteNombre;
+    private String remitenteRol;
 
     private Long destinatarioId; // puede ser null si es comunicado general
+    private Long cursoId;
     private String destinatarioNombre;
+    private String destinatarioRol;
 
     @Enumerated(EnumType.STRING)
     private TipoMensaje tipoMensaje;

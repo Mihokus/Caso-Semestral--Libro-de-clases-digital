@@ -4,7 +4,8 @@ import com.microservicio.mensajeria.dto.MensajeRequest;
 import com.microservicio.mensajeria.dto.MensajeResponse;
 import com.microservicio.mensajeria.model.DestinatarioTipo;
 import com.microservicio.mensajeria.model.TipoMensaje;
-import com.microservicio.mensajeria.service.MensajeService;
+import com.microservicio.mensajeria.service.MensajeriaCommandService;
+import com.microservicio.mensajeria.service.MensajeriaQueryService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,10 +13,12 @@ import java.util.List;
 @Component
 public class MensajeriaFacade {
 
-    private final MensajeService mensajeService;
+    private final MensajeriaCommandService mensajeriaCommandService;
+    private final MensajeriaQueryService mensajeriaQueryService;
 
-    public MensajeriaFacade(MensajeService mensajeService) {
-        this.mensajeService = mensajeService;
+    public MensajeriaFacade(MensajeriaCommandService mensajeriaCommandService, MensajeriaQueryService mensajeriaQueryService) {
+        this.mensajeriaCommandService = mensajeriaCommandService;
+        this.mensajeriaQueryService = mensajeriaQueryService;
     }
 
     public MensajeResponse publicarMensajeDifusion(MensajeRequest request) {
@@ -32,7 +35,7 @@ public class MensajeriaFacade {
         request.setDestinatarioId(null);
         request.setDestinatarioNombre(null);
 
-        return mensajeService.crearMensaje(request);
+        return mensajeriaCommandService.crearMensaje(request);
     }
 
     public MensajeResponse enviarComunicacionDirecta(MensajeRequest request) {
@@ -49,32 +52,32 @@ public class MensajeriaFacade {
         request.setTipoMensaje(TipoMensaje.MENSAJE_DIRECTO);
         request.setDestinatarioTipo(DestinatarioTipo.INDIVIDUAL);
 
-        return mensajeService.crearMensaje(request);
+        return mensajeriaCommandService.crearMensaje(request);
     }
 
     public List<MensajeResponse> obtenerBandejaUsuario(Long usuarioId) {
         validarId(usuarioId, "usuarioId");
-        return mensajeService.obtenerPorDestinatario(usuarioId);
+        return mensajeriaQueryService.obtenerPorDestinatario(usuarioId);
     }
 
     public List<MensajeResponse> obtenerHistorialUsuario(Long usuarioId) {
         validarId(usuarioId, "usuarioId");
-        return mensajeService.obtenerPorRemitente(usuarioId);
+        return mensajeriaQueryService.obtenerPorRemitente(usuarioId);
     }
 
     public MensajeResponse obtenerDetalleMensaje(Long mensajeId) {
         validarId(mensajeId, "mensajeId");
-        return mensajeService.obtenerPorId(mensajeId);
+        return mensajeriaQueryService.obtenerPorId(mensajeId);
     }
 
     public MensajeResponse registrarLecturaMensaje(Long mensajeId) {
         validarId(mensajeId, "mensajeId");
-        return mensajeService.marcarComoLeido(mensajeId);
+        return mensajeriaCommandService.marcarComoLeido(mensajeId);
     }
 
     public void eliminarMensaje(Long mensajeId) {
         validarId(mensajeId, "mensajeId");
-        mensajeService.eliminarMensaje(mensajeId);
+        mensajeriaCommandService.eliminarMensaje(mensajeId);
     }
 
     private void validarMensajeBase(MensajeRequest request) {
@@ -88,6 +91,10 @@ public class MensajeriaFacade {
 
         if (request.getContenido() == null || request.getContenido().isBlank()) {
             throw new IllegalArgumentException("El contenido del mensaje es obligatorio");
+        }
+
+        if (request.getCursoId() == null) {
+            throw new IllegalArgumentException("El cursoId es obligatorio");
         }
 
         if (request.getRemitenteId() == null) {

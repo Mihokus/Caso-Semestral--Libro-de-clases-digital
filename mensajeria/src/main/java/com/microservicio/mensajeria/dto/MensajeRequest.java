@@ -16,9 +16,12 @@ public class MensajeRequest {
 
     private Long remitenteId;
     private String remitenteNombre;
+    private String remitenteRol;
 
     private Long destinatarioId;
+    private Long cursoId;
     private String destinatarioNombre;
+    private String destinatarioRol;
 
     private TipoMensaje tipoMensaje;
     private DestinatarioTipo destinatarioTipo;
