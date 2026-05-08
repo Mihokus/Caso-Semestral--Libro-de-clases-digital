@@ -41,63 +41,69 @@ export default function RegisterPage() {
   }
 
   return (
-    <div>
-      <h1>Registrar</h1>
-      <form onSubmit={onSubmit}>
-        <div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <div className="card w-full max-w-md">
+        <h1>Registrar</h1>
+        <form onSubmit={onSubmit}>
           <label>Email</label>
           <input
+            className="w-full"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </div>
-        <div>
           <label>Nombre</label>
           <input
+            className="w-full"
             type="text"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             required
           />
-        </div>
-        <div>
           <label>Password</label>
           <input
+            className="w-full"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             minLength={6}
             required
           />
-        </div>
-        <div>
           <label>Rol</label>
-          <select value={role} onChange={(e) => setRole(e.target.value as Role)}>
+          <select
+            className="w-full"
+            value={role}
+            onChange={(e) => setRole(e.target.value as Role)}
+          >
             {ROLES.map((r) => (
               <option key={r} value={r}>
                 {r}
               </option>
             ))}
           </select>
-        </div>
-        <div>
           <label>Entity ID (opcional, alumnoId/docenteId/apoderadoId)</label>
           <input
+            className="w-full"
             type="number"
             value={entityId}
             onChange={(e) => setEntityId(e.target.value)}
           />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Registrando..." : "Registrar"}
-        </button>
-      </form>
-      {error && <p>Error: {error}</p>}
-      <p>
-        <Link to="/login">Volver al login</Link>
-      </p>
+          <div className="mt-4">
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? "Registrando..." : "Registrar"}
+            </button>
+          </div>
+        </form>
+        {error && (
+          <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-3 text-sm">
+            {error}
+          </p>
+        )}
+        <p className="text-sm mt-3">
+          <Link to="/login">Volver al login</Link>
+        </p>
+      </div>
     </div>
   );
 }

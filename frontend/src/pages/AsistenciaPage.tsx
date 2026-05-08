@@ -19,22 +19,37 @@ export default function AsistenciaPage() {
   return (
     <div>
       <h1>Asistencia</h1>
-      <nav>
-        <button onClick={() => setTab("tomar")} disabled={tab === "tomar"}>
+      <div className="border-b border-gray-300 flex gap-1 mb-4">
+        <TabBtn active={tab === "tomar"} onClick={() => setTab("tomar")}>
           Tomar asistencia
-        </button>
-        <button onClick={() => setTab("historial")} disabled={tab === "historial"}>
+        </TabBtn>
+        <TabBtn active={tab === "historial"} onClick={() => setTab("historial")}>
           Historial
-        </button>
-        <button onClick={() => setTab("anotaciones")} disabled={tab === "anotaciones"}>
+        </TabBtn>
+        <TabBtn active={tab === "anotaciones"} onClick={() => setTab("anotaciones")}>
           Anotaciones
-        </button>
-      </nav>
-      <hr />
+        </TabBtn>
+      </div>
       {tab === "tomar" && <TomarTab />}
       {tab === "historial" && <HistorialTab />}
       {tab === "anotaciones" && <AnotacionesTab />}
     </div>
+  );
+}
+
+function TabBtn({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button onClick={onClick} className={`tab-btn ${active ? "tab-active" : ""}`}>
+      {children}
+    </button>
   );
 }
 
@@ -76,51 +91,61 @@ function TomarTab() {
   }
 
   return (
-    <div>
+    <div className="card">
       <h2>Tomar asistencia</h2>
-      <div>
-        <label>Curso ID</label>
-        <input value={cursoId} onChange={(e) => setCursoId(e.target.value)} />
-        <label>Fecha</label>
-        <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
-        <button onClick={cargarAlumnos}>Cargar alumnos</button>
+      <div className="row">
+        <div>
+          <label>Curso ID</label>
+          <input value={cursoId} onChange={(e) => setCursoId(e.target.value)} />
+        </div>
+        <div>
+          <label>Fecha</label>
+          <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+        </div>
+        <button onClick={cargarAlumnos} className="btn btn-secondary">
+          Cargar alumnos
+        </button>
       </div>
-      {error && <p>Error: {error}</p>}
-      {msg && <p>{msg}</p>}
+      <ErrorBox text={error} />
+      <SuccessBox text={msg} />
       {alumnos.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Alumno</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {alumnos.map((a) => (
-              <tr key={a.id}>
-                <td>{a.id}</td>
-                <td>{a.nombre}</td>
-                <td>
-                  <select
-                    value={estados[a.id]}
-                    onChange={(e) =>
-                      setEstados({ ...estados, [a.id]: e.target.value as EstadoAsistencia })
-                    }
-                  >
-                    {ESTADOS.map((est) => (
-                      <option key={est} value={est}>
-                        {est}
-                      </option>
-                    ))}
-                  </select>
-                </td>
+        <>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Alumno</th>
+                <th>Estado</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {alumnos.map((a) => (
+                <tr key={a.id}>
+                  <td>{a.id}</td>
+                  <td>{a.nombre}</td>
+                  <td>
+                    <select
+                      value={estados[a.id]}
+                      onChange={(e) =>
+                        setEstados({ ...estados, [a.id]: e.target.value as EstadoAsistencia })
+                      }
+                    >
+                      {ESTADOS.map((est) => (
+                        <option key={est} value={est}>
+                          {est}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button onClick={guardar} className="btn btn-primary mt-2">
+            Guardar asistencia del día
+          </button>
+        </>
       )}
-      {alumnos.length > 0 && <button onClick={guardar}>Guardar asistencia del día</button>}
     </div>
   );
 }
@@ -141,14 +166,20 @@ function HistorialTab() {
   }
 
   return (
-    <div>
-      <h2>Historial de asistencia (por alumno)</h2>
-      <label>Alumno ID</label>
-      <input value={alumnoId} onChange={(e) => setAlumnoId(e.target.value)} />
-      <button onClick={buscar}>Buscar</button>
-      {error && <p>Error: {error}</p>}
+    <div className="card">
+      <h2>Historial por alumno</h2>
+      <div className="row">
+        <div>
+          <label>Alumno ID</label>
+          <input value={alumnoId} onChange={(e) => setAlumnoId(e.target.value)} />
+        </div>
+        <button onClick={buscar} className="btn btn-secondary">
+          Buscar
+        </button>
+      </div>
+      <ErrorBox text={error} />
       {data.length === 0 ? (
-        <p>(sin registros)</p>
+        <p className="text-sm text-gray-600 mt-2">(sin registros)</p>
       ) : (
         <table>
           <thead>
@@ -218,34 +249,47 @@ function AnotacionesTab() {
   }, []);
 
   return (
-    <div>
+    <div className="card">
       <h2>Anotaciones</h2>
       <form onSubmit={guardar}>
-        <label>Alumno ID</label>
-        <input value={alumnoId} onChange={(e) => setAlumnoId(e.target.value)} required />
-        <label>Tipo</label>
-        <select value={tipo} onChange={(e) => setTipo(e.target.value as TipoAnotacion)}>
-          {TIPOS.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-        <label>Descripción</label>
-        <input
-          value={descripcion}
-          onChange={(e) => setDescripcion(e.target.value)}
-          required
-        />
-        <button type="submit">Registrar anotación</button>
-        <button type="button" onClick={cargar}>
-          Recargar lista
-        </button>
+        <div className="row">
+          <div>
+            <label>Alumno ID</label>
+            <input value={alumnoId} onChange={(e) => setAlumnoId(e.target.value)} required />
+          </div>
+          <div>
+            <label>Tipo</label>
+            <select value={tipo} onChange={(e) => setTipo(e.target.value as TipoAnotacion)}>
+              {TIPOS.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <label>Descripción</label>
+            <input
+              className="w-full"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+        <div className="mt-3 flex gap-2">
+          <button type="submit" className="btn btn-primary">
+            Registrar anotación
+          </button>
+          <button type="button" onClick={cargar} className="btn btn-secondary">
+            Recargar lista
+          </button>
+        </div>
       </form>
-      {error && <p>Error: {error}</p>}
-      {msg && <p>{msg}</p>}
+      <ErrorBox text={error} />
+      <SuccessBox text={msg} />
       {data.length === 0 ? (
-        <p>(sin anotaciones)</p>
+        <p className="text-sm text-gray-600 mt-2">(sin anotaciones)</p>
       ) : (
         <table>
           <thead>
@@ -271,5 +315,23 @@ function AnotacionesTab() {
         </table>
       )}
     </div>
+  );
+}
+
+function ErrorBox({ text }: { text: string | null }) {
+  if (!text) return null;
+  return (
+    <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-2 text-sm">
+      {text}
+    </p>
+  );
+}
+
+function SuccessBox({ text }: { text: string | null }) {
+  if (!text) return null;
+  return (
+    <p className="text-green-700 bg-green-100 border border-green-300 rounded px-2 py-1 mt-2 text-sm">
+      {text}
+    </p>
   );
 }

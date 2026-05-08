@@ -10,22 +10,37 @@ export default function MensajesPage() {
   return (
     <div>
       <h1>Mensajes</h1>
-      <nav>
-        <button onClick={() => setTab("inbox")} disabled={tab === "inbox"}>
+      <div className="border-b border-gray-300 flex gap-1 mb-4">
+        <TabBtn active={tab === "inbox"} onClick={() => setTab("inbox")}>
           Inbox
-        </button>
-        <button onClick={() => setTab("enviados")} disabled={tab === "enviados"}>
+        </TabBtn>
+        <TabBtn active={tab === "enviados"} onClick={() => setTab("enviados")}>
           Enviados
-        </button>
-        <button onClick={() => setTab("nuevo")} disabled={tab === "nuevo"}>
+        </TabBtn>
+        <TabBtn active={tab === "nuevo"} onClick={() => setTab("nuevo")}>
           Nuevo
-        </button>
-      </nav>
-      <hr />
+        </TabBtn>
+      </div>
       {tab === "inbox" && <ListaTab loader={mensajeria.inbox} />}
       {tab === "enviados" && <ListaTab loader={mensajeria.enviados} />}
       {tab === "nuevo" && <NuevoTab />}
     </div>
+  );
+}
+
+function TabBtn({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button onClick={onClick} className={`tab-btn ${active ? "tab-active" : ""}`}>
+      {children}
+    </button>
   );
 }
 
@@ -67,11 +82,17 @@ function ListaTab({ loader }: { loader: () => Promise<MensajeDTO[]> }) {
   }, [loader]);
 
   return (
-    <div>
-      <button onClick={cargar}>Recargar</button>
-      {error && <p>Error: {error}</p>}
+    <div className="card">
+      <button onClick={cargar} className="btn btn-secondary mb-2">
+        Recargar
+      </button>
+      {error && (
+        <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-2 text-sm">
+          {error}
+        </p>
+      )}
       {data.length === 0 ? (
-        <p>(sin mensajes)</p>
+        <p className="text-sm text-gray-600">(sin mensajes)</p>
       ) : (
         <table>
           <thead>
@@ -97,10 +118,19 @@ function ListaTab({ loader }: { loader: () => Promise<MensajeDTO[]> }) {
                 <td>{m.contenido}</td>
                 <td>{m.leido ? "✓" : ""}</td>
                 <td>
-                  {!m.leido && (
-                    <button onClick={() => marcarLeido(m.id)}>Marcar leído</button>
-                  )}
-                  <button onClick={() => eliminar(m.id)}>Eliminar</button>
+                  <div className="flex gap-1">
+                    {!m.leido && (
+                      <button
+                        onClick={() => marcarLeido(m.id)}
+                        className="btn btn-secondary"
+                      >
+                        Leído
+                      </button>
+                    )}
+                    <button onClick={() => eliminar(m.id)} className="btn btn-danger">
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -149,24 +179,24 @@ function NuevoTab() {
   }
 
   return (
-    <div>
+    <div className="card">
       <h2>Nuevo mensaje</h2>
-      <div>
-        <label>
+      <div className="flex gap-4 mb-3">
+        <label className="flex items-center gap-1">
           <input
             type="radio"
             checked={modo === "directo"}
             onChange={() => setModo("directo")}
-          />{" "}
-          Directo
+          />
+          <span className="text-sm">Directo</span>
         </label>
-        <label>
+        <label className="flex items-center gap-1">
           <input
             type="radio"
             checked={modo === "comunicado"}
             onChange={() => setModo("comunicado")}
-          />{" "}
-          Comunicado al curso
+          />
+          <span className="text-sm">Comunicado al curso</span>
         </label>
       </div>
       <form onSubmit={enviar}>
@@ -191,22 +221,37 @@ function NuevoTab() {
             />
           </div>
         )}
-        <div>
-          <label>Título</label>
-          <input value={titulo} onChange={(e) => setTitulo(e.target.value)} required />
+        <label>Título</label>
+        <input
+          className="w-full"
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
+          required
+        />
+        <label>Contenido</label>
+        <textarea
+          className="w-full"
+          rows={4}
+          value={contenido}
+          onChange={(e) => setContenido(e.target.value)}
+          required
+        />
+        <div className="mt-3">
+          <button type="submit" className="btn btn-primary">
+            Enviar
+          </button>
         </div>
-        <div>
-          <label>Contenido</label>
-          <textarea
-            value={contenido}
-            onChange={(e) => setContenido(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Enviar</button>
       </form>
-      {error && <p>Error: {error}</p>}
-      {msg && <p>{msg}</p>}
+      {error && (
+        <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-2 text-sm">
+          {error}
+        </p>
+      )}
+      {msg && (
+        <p className="text-green-700 bg-green-100 border border-green-300 rounded px-2 py-1 mt-2 text-sm">
+          {msg}
+        </p>
+      )}
     </div>
   );
 }

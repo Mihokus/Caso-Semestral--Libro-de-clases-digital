@@ -30,45 +30,53 @@ export default function LoginPage() {
   }
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={onSubmit}>
-        <div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <div className="card w-full max-w-md">
+        <h1>Login</h1>
+        <form onSubmit={onSubmit}>
           <label>Email</label>
           <input
+            className="w-full"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
           />
-        </div>
-        <div>
           <label>Password</label>
           <input
+            className="w-full"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
           />
+          <div className="mt-4">
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? "Ingresando..." : "Ingresar"}
+            </button>
+          </div>
+        </form>
+        {error && (
+          <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-3 text-sm">
+            {error}
+          </p>
+        )}
+        <p className="text-sm mt-3">
+          ¿No tenés cuenta? <Link to="/register">Registrarme</Link>
+        </p>
+        <hr />
+        <div className="text-xs text-gray-600">
+          <div className="font-medium mb-1">Demo creds:</div>
+          <ul className="list-disc list-inside space-y-0.5">
+            <li>admin@colegio.cl / admin123</li>
+            <li>docente@colegio.cl / docente123</li>
+            <li>apoderado@colegio.cl / apoderado123</li>
+            <li>estudiante@colegio.cl / estudiante123</li>
+          </ul>
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Ingresando..." : "Ingresar"}
-        </button>
-      </form>
-      {error && <p>Error: {error}</p>}
-      <p>
-        ¿No tenés cuenta? <Link to="/register">Registrarme</Link>
-      </p>
-      <hr />
-      <p>Demo creds:</p>
-      <ul>
-        <li>admin@colegio.cl / admin123</li>
-        <li>docente@colegio.cl / docente123</li>
-        <li>apoderado@colegio.cl / apoderado123</li>
-        <li>estudiante@colegio.cl / estudiante123</li>
-      </ul>
+      </div>
     </div>
   );
 }

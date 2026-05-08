@@ -15,26 +15,41 @@ export default function AcademicaPage() {
   return (
     <div>
       <h1>Académica</h1>
-      <nav>
-        <button onClick={() => setTab("asignaturas")} disabled={tab === "asignaturas"}>
+      <div className="border-b border-gray-300 flex gap-1 mb-4">
+        <TabBtn active={tab === "asignaturas"} onClick={() => setTab("asignaturas")}>
           Asignaturas
-        </button>
-        <button onClick={() => setTab("cursos")} disabled={tab === "cursos"}>
+        </TabBtn>
+        <TabBtn active={tab === "cursos"} onClick={() => setTab("cursos")}>
           Cursos
-        </button>
-        <button onClick={() => setTab("notas")} disabled={tab === "notas"}>
+        </TabBtn>
+        <TabBtn active={tab === "notas"} onClick={() => setTab("notas")}>
           Notas
-        </button>
-        <button onClick={() => setTab("rendimiento")} disabled={tab === "rendimiento"}>
+        </TabBtn>
+        <TabBtn active={tab === "rendimiento"} onClick={() => setTab("rendimiento")}>
           Rendimiento
-        </button>
-      </nav>
-      <hr />
+        </TabBtn>
+      </div>
       {tab === "asignaturas" && <AsignaturasTab />}
       {tab === "cursos" && <CursosTab />}
       {tab === "notas" && <NotasTab />}
       {tab === "rendimiento" && <RendimientoTab />}
     </div>
+  );
+}
+
+function TabBtn({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button onClick={onClick} className={`tab-btn ${active ? "tab-active" : ""}`}>
+      {children}
+    </button>
   );
 }
 
@@ -80,32 +95,43 @@ function AsignaturasTab() {
   }, []);
 
   return (
-    <div>
+    <div className="card">
       <h2>Asignaturas</h2>
-      <form onSubmit={crear}>
-        <label>Nombre</label>
-        <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-        <label>Curso ID</label>
-        <input
-          type="number"
-          value={cursoId}
-          onChange={(e) => setCursoId(e.target.value)}
-          required
-        />
-        <label>Docente ID</label>
-        <input
-          type="number"
-          value={docenteId}
-          onChange={(e) => setDocenteId(e.target.value)}
-          required
-        />
-        <button type="submit">Crear asignatura</button>
+      <form onSubmit={crear} className="mb-3">
+        <div className="row">
+          <div>
+            <label>Nombre</label>
+            <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+          </div>
+          <div>
+            <label>Curso ID</label>
+            <input
+              type="number"
+              value={cursoId}
+              onChange={(e) => setCursoId(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Docente ID</label>
+            <input
+              type="number"
+              value={docenteId}
+              onChange={(e) => setDocenteId(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">
+            Crear asignatura
+          </button>
+        </div>
       </form>
-      {error && <p>Error: {error}</p>}
-      {msg && <p>{msg}</p>}
-      <button onClick={cargar}>Recargar lista</button>
+      <Box error={error} msg={msg} />
+      <button onClick={cargar} className="btn btn-secondary mb-2">
+        Recargar lista
+      </button>
       {data.length === 0 ? (
-        <p>(sin asignaturas)</p>
+        <p className="text-sm text-gray-600">(sin asignaturas)</p>
       ) : (
         <table>
           <thead>
@@ -164,19 +190,29 @@ function CursosTab() {
   }, []);
 
   return (
-    <div>
+    <div className="card">
       <h2>Cursos</h2>
-      <form onSubmit={crear}>
-        <label>Nombre (ej. 8°A)</label>
-        <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-        <label>Nivel (ej. Básica / Media)</label>
-        <input value={nivel} onChange={(e) => setNivel(e.target.value)} required />
-        <button type="submit">Crear curso</button>
+      <form onSubmit={crear} className="mb-3">
+        <div className="row">
+          <div>
+            <label>Nombre (ej. 8°A)</label>
+            <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+          </div>
+          <div>
+            <label>Nivel</label>
+            <input value={nivel} onChange={(e) => setNivel(e.target.value)} required />
+          </div>
+          <button type="submit" className="btn btn-primary">
+            Crear curso
+          </button>
+        </div>
       </form>
-      {error && <p>Error: {error}</p>}
-      <button onClick={cargar}>Recargar</button>
+      <Box error={error} msg={null} />
+      <button onClick={cargar} className="btn btn-secondary mb-2">
+        Recargar
+      </button>
       {data.length === 0 ? (
-        <p>(sin cursos)</p>
+        <p className="text-sm text-gray-600">(sin cursos)</p>
       ) : (
         <table>
           <thead>
@@ -245,57 +281,76 @@ function NotasTab() {
   }
 
   return (
-    <div>
-      <h2>Notas</h2>
-      <h3>Registrar nota</h3>
-      <form onSubmit={registrar}>
-        <label>Alumno ID</label>
-        <input
-          type="number"
-          value={alumnoId}
-          onChange={(e) => setAlumnoId(e.target.value)}
-          required
-        />
-        <label>Asignatura ID</label>
-        <input
-          type="number"
-          value={asignaturaId}
-          onChange={(e) => setAsignaturaId(e.target.value)}
-          required
-        />
-        <label>Nombre evaluación</label>
-        <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-        <label>Nota (1.0–7.0)</label>
-        <input
-          type="number"
-          step="0.1"
-          min="1"
-          max="7"
-          value={nota}
-          onChange={(e) => setNota(e.target.value)}
-          required
-        />
-        <label>Ponderación (0.0–1.0)</label>
-        <input
-          type="number"
-          step="0.05"
-          min="0"
-          max="1"
-          value={ponderacion}
-          onChange={(e) => setPonderacion(e.target.value)}
-          required
-        />
-        <button type="submit">Registrar</button>
+    <div className="card">
+      <h2>Registrar nota</h2>
+      <form onSubmit={registrar} className="mb-3">
+        <div className="row">
+          <div>
+            <label>Alumno ID</label>
+            <input
+              type="number"
+              value={alumnoId}
+              onChange={(e) => setAlumnoId(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Asignatura ID</label>
+            <input
+              type="number"
+              value={asignaturaId}
+              onChange={(e) => setAsignaturaId(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Nombre evaluación</label>
+            <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+          </div>
+          <div>
+            <label>Nota (1.0–7.0)</label>
+            <input
+              type="number"
+              step="0.1"
+              min="1"
+              max="7"
+              value={nota}
+              onChange={(e) => setNota(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Ponderación (0–1)</label>
+            <input
+              type="number"
+              step="0.05"
+              min="0"
+              max="1"
+              value={ponderacion}
+              onChange={(e) => setPonderacion(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">
+            Registrar
+          </button>
+        </div>
       </form>
-      {msg && <p>{msg}</p>}
+      <Box error={null} msg={msg} />
       <hr />
-      <h3>Notas por alumno</h3>
-      <label>Alumno ID</label>
-      <input value={alumnoIdLista} onChange={(e) => setAlumnoIdLista(e.target.value)} />
-      <button onClick={buscar}>Buscar</button>
-      {error && <p>Error: {error}</p>}
+      <h2>Notas por alumno</h2>
+      <div className="row">
+        <div>
+          <label>Alumno ID</label>
+          <input value={alumnoIdLista} onChange={(e) => setAlumnoIdLista(e.target.value)} />
+        </div>
+        <button onClick={buscar} className="btn btn-secondary">
+          Buscar
+        </button>
+      </div>
+      <Box error={error} msg={null} />
       {data.length === 0 ? (
-        <p>(sin notas)</p>
+        <p className="text-sm text-gray-600 mt-2">(sin notas)</p>
       ) : (
         <table>
           <thead>
@@ -304,7 +359,7 @@ function NotasTab() {
               <th>Asignatura</th>
               <th>Evaluación</th>
               <th>Nota</th>
-              <th>Ponderación</th>
+              <th>Pond.</th>
             </tr>
           </thead>
           <tbody>
@@ -339,17 +394,31 @@ function RendimientoTab() {
   }
 
   return (
-    <div>
+    <div className="card">
       <h2>Rendimiento por asignatura</h2>
-      <label>Asignatura ID</label>
-      <input value={asignaturaId} onChange={(e) => setAsignaturaId(e.target.value)} />
-      <button onClick={cargar}>Cargar</button>
-      {error && <p>Error: {error}</p>}
-      {data && (
+      <div className="row">
         <div>
+          <label>Asignatura ID</label>
+          <input value={asignaturaId} onChange={(e) => setAsignaturaId(e.target.value)} />
+        </div>
+        <button onClick={cargar} className="btn btn-secondary">
+          Cargar
+        </button>
+      </div>
+      <Box error={error} msg={null} />
+      {data && (
+        <div className="mt-3">
           <h3>{data.asignaturaNombre}</h3>
-          <p>Promedio del curso: {data.promedioCurso}</p>
-          <p>Cantidad de evaluaciones: {data.cantidadEvaluaciones}</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 my-3">
+            <div className="card">
+              <div className="stat-label">Promedio del curso</div>
+              <div className="stat-value">{data.promedioCurso}</div>
+            </div>
+            <div className="card">
+              <div className="stat-label">Cantidad de evaluaciones</div>
+              <div className="stat-value">{data.cantidadEvaluaciones}</div>
+            </div>
+          </div>
           <table>
             <thead>
               <tr>
@@ -371,5 +440,22 @@ function RendimientoTab() {
         </div>
       )}
     </div>
+  );
+}
+
+function Box({ error, msg }: { error: string | null; msg: string | null }) {
+  return (
+    <>
+      {error && (
+        <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-2 text-sm">
+          {error}
+        </p>
+      )}
+      {msg && (
+        <p className="text-green-700 bg-green-100 border border-green-300 rounded px-2 py-1 mt-2 text-sm">
+          {msg}
+        </p>
+      )}
+    </>
   );
 }

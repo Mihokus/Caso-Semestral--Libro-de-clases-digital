@@ -14,22 +14,37 @@ export default function AdminPage() {
   return (
     <div>
       <h1>Administración</h1>
-      <nav>
-        <button onClick={() => setTab("usuarios")} disabled={tab === "usuarios"}>
+      <div className="border-b border-gray-300 flex gap-1 mb-4">
+        <TabBtn active={tab === "usuarios"} onClick={() => setTab("usuarios")}>
           Usuarios
-        </button>
-        <button onClick={() => setTab("roles")} disabled={tab === "roles"}>
+        </TabBtn>
+        <TabBtn active={tab === "roles"} onClick={() => setTab("roles")}>
           Roles
-        </button>
-        <button onClick={() => setTab("menus")} disabled={tab === "menus"}>
+        </TabBtn>
+        <TabBtn active={tab === "menus"} onClick={() => setTab("menus")}>
           Menús
-        </button>
-      </nav>
-      <hr />
+        </TabBtn>
+      </div>
       {tab === "usuarios" && <UsersTab />}
       {tab === "roles" && <RolesTab />}
       {tab === "menus" && <MenusTab />}
     </div>
+  );
+}
+
+function TabBtn({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button onClick={onClick} className={`tab-btn ${active ? "tab-active" : ""}`}>
+      {children}
+    </button>
   );
 }
 
@@ -89,10 +104,18 @@ function UsersTab() {
   }, []);
 
   return (
-    <div>
-      <h2>Usuarios</h2>
-      <button onClick={cargar}>Recargar</button>
-      {error && <p>Error: {error}</p>}
+    <div className="card">
+      <div className="flex justify-between items-center">
+        <h2>Usuarios</h2>
+        <button onClick={cargar} className="btn btn-secondary">
+          Recargar
+        </button>
+      </div>
+      {error && (
+        <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-2 text-sm">
+          {error}
+        </p>
+      )}
       <table>
         <thead>
           <tr>
@@ -111,15 +134,15 @@ function UsersTab() {
               <td>{u.nombre}</td>
               <td>
                 {editingId === u.id ? (
-                  <div>
+                  <div className="flex flex-col gap-1">
                     {roles.map((r) => (
-                      <label key={r.id}>
+                      <label key={r.id} className="flex items-center gap-1">
                         <input
                           type="checkbox"
                           checked={pickedRoleIds.includes(r.id)}
                           onChange={() => toggleRole(r.id)}
                         />
-                        {r.nombre}
+                        <span className="text-sm">{r.nombre}</span>
                       </label>
                     ))}
                   </div>
@@ -128,17 +151,30 @@ function UsersTab() {
                 )}
               </td>
               <td>
-                {editingId === u.id ? (
-                  <>
-                    <button onClick={saveRoles}>Guardar</button>
-                    <button onClick={() => setEditingId(null)}>Cancelar</button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={() => startEdit(u)}>Editar roles</button>
-                    <button onClick={() => eliminar(u.id)}>Eliminar</button>
-                  </>
-                )}
+                <div className="flex gap-1">
+                  {editingId === u.id ? (
+                    <>
+                      <button onClick={saveRoles} className="btn btn-primary">
+                        Guardar
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="btn btn-secondary"
+                      >
+                        Cancelar
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => startEdit(u)} className="btn btn-secondary">
+                        Editar roles
+                      </button>
+                      <button onClick={() => eliminar(u.id)} className="btn btn-danger">
+                        Eliminar
+                      </button>
+                    </>
+                  )}
+                </div>
               </td>
             </tr>
           ))}
@@ -184,17 +220,37 @@ function RolesTab() {
   }, []);
 
   return (
-    <div>
+    <div className="card">
       <h2>Roles</h2>
-      <form onSubmit={crear}>
-        <label>Nombre</label>
-        <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-        <label>Descripción</label>
-        <input value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
-        <button type="submit">Crear rol</button>
+      <form onSubmit={crear} className="mb-3">
+        <div className="row">
+          <div>
+            <label>Nombre</label>
+            <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <label>Descripción</label>
+            <input
+              className="w-full"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">
+            Crear rol
+          </button>
+        </div>
       </form>
-      {error && <p>Error: {error}</p>}
-      {msg && <p>{msg}</p>}
+      {error && (
+        <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-2 text-sm">
+          {error}
+        </p>
+      )}
+      {msg && (
+        <p className="text-green-700 bg-green-100 border border-green-300 rounded px-2 py-1 mt-2 text-sm">
+          {msg}
+        </p>
+      )}
       <table>
         <thead>
           <tr>
@@ -271,36 +327,56 @@ function MenusTab() {
   }, []);
 
   return (
-    <div>
+    <div className="card">
       <h2>Menús</h2>
-      <form onSubmit={crear}>
-        <label>Label</label>
-        <input value={label} onChange={(e) => setLabel(e.target.value)} required />
-        <label>Path</label>
-        <input value={path} onChange={(e) => setPath(e.target.value)} required />
-        <label>Orden</label>
-        <input
-          type="number"
-          value={orden}
-          onChange={(e) => setOrden(e.target.value)}
-        />
+      <form onSubmit={crear} className="mb-3">
+        <div className="row">
+          <div>
+            <label>Label</label>
+            <input value={label} onChange={(e) => setLabel(e.target.value)} required />
+          </div>
+          <div>
+            <label>Path</label>
+            <input value={path} onChange={(e) => setPath(e.target.value)} required />
+          </div>
+          <div>
+            <label>Orden</label>
+            <input
+              type="number"
+              value={orden}
+              onChange={(e) => setOrden(e.target.value)}
+            />
+          </div>
+        </div>
         <fieldset>
           <legend>Roles que ven el menú</legend>
-          {roles.map((r) => (
-            <label key={r.id}>
-              <input
-                type="checkbox"
-                checked={pickedRoleIds.includes(r.id)}
-                onChange={() => toggleRole(r.id)}
-              />
-              {r.nombre}
-            </label>
-          ))}
+          <div className="flex flex-wrap gap-2">
+            {roles.map((r) => (
+              <label key={r.id} className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  checked={pickedRoleIds.includes(r.id)}
+                  onChange={() => toggleRole(r.id)}
+                />
+                <span className="text-sm">{r.nombre}</span>
+              </label>
+            ))}
+          </div>
         </fieldset>
-        <button type="submit">Crear menú</button>
+        <button type="submit" className="btn btn-primary mt-2">
+          Crear menú
+        </button>
       </form>
-      {error && <p>Error: {error}</p>}
-      {msg && <p>{msg}</p>}
+      {error && (
+        <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-2 text-sm">
+          {error}
+        </p>
+      )}
+      {msg && (
+        <p className="text-green-700 bg-green-100 border border-green-300 rounded px-2 py-1 mt-2 text-sm">
+          {msg}
+        </p>
+      )}
       <table>
         <thead>
           <tr>
