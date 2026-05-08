@@ -56,4 +56,9 @@ public class AcademicController{
         return ResponseEntity.ok(academicFacade.listarCursos());
     }
 
+    @GetMapping("/cursos/{id}")
+    public ResponseEntity<Curso> obtenerCursoPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(academicFacade.obtenerCursoPorId(id));
+    }
+
 }
