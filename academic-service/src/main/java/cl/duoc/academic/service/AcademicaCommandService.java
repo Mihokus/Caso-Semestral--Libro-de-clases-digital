@@ -7,7 +7,7 @@ import cl.duoc.academic.dto.*;
 @Service
 public class AcademicaCommandService {
     @Autowired private EvaluacionRepository evalRepo;
-    @Autowired private AsignaturaRepository asiRepo;
+    @Autowired private AsignaturaRepository asigRepo;
     @Autowired private CursoRepository cursoRepo;
 
     public Evaluacion registrarNota (EvaluacionDTO dto){
@@ -17,7 +17,7 @@ public class AcademicaCommandService {
         Evaluacion nueva = new Evaluacion();
         nueva.setAsignatura(asig);
         nueva.setAsignaturaNombre(asig.getNombreAsignatura());
-        nueva.setAlumnoId(dto.getAlumnoid());
+        nueva.setAlumnoId(dto.getAlumnoId());
         nueva.setAlumnoNombre(dto.getAlumnoNombre());
         nueva.setNombre(dto.getNombre());
         nueva.setNota(dto.getNota());

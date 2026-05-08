@@ -15,11 +15,11 @@ public class AcademicaQueryService {
         return evalRepo.findByAlumnoId(alumnoId);
     }
 
-    public RendimientoDTO obtenerRedimiento(Long asignaturaId){
+    public RendimientoDTO obtenerRendimientoRico(Long asignaturaId){
         List<Evaluacion> notas = evalRepo.findByAsignaturaId(asignaturaId);
         if (notas.isEmpty()) return new RendimientoDTO(0.0, 0, "Sin datos");
 
-        Double promedio = notas.steam().mapToDouble(Evaluacion::getNota).average().orElse(0.0);
+        Double promedio = notas.stream().mapToDouble(Evaluacion::getNota).average().orElse(0.0);
         String estado = promedio >= 4.0 ? "Aprobando" : "Riesgo Repitencia";
 
         return new RendimientoDTO(promedio, notas.size(), estado);

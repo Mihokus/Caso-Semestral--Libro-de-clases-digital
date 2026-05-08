@@ -7,5 +7,5 @@ public class AsignaturaDTO {
     private Long id;
     private String nombre;
     private String cursoNombre;
-    private String docenteNoombre;
+    private String docenteNombre;
 }

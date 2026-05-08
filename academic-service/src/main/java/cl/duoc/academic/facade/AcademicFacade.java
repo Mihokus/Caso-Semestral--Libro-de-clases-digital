@@ -6,7 +6,9 @@ import java.util.List;
 public interface AcademicFacade {
     Evaluacion registrarNota(EvaluacionDTO dto);
     Curso guardarCurso (Curso curso);
+    Asignatura guardarAsignatura(Asignatura asignatura);
+    List<Asignatura> listarAsignaturas();
     List<Evaluacion> obtenerNotasAlumno (Long alumnoId);
-    RendimientoDTO obtenerRendimientoRico(Long asignaturaId);
+    RendimientoDTO obtenerRendimientoTotal(Long asignaturaId);
     List<Curso> listarCursos();
 }
