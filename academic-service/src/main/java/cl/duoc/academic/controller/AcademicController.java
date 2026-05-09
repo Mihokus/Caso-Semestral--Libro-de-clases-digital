@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import cl.duoc.academic.model.Asignatura;
 import cl.duoc.academic.dto.AsignaturaDTO;
+import cl.duoc.academic.dto.RendimientoDTO;
+import cl.duoc.academic.model.Curso;
 import java.util.List;
 
 @RestController
@@ -18,33 +20,45 @@ public class AcademicController{
 
     @PostMapping("/registrarNotas")
     public ResponseEntity<Evaluacion> registrarNota(@RequestBody EvaluacionDTO dto){
-        Evaluacion nuevaNota = academicFacade.registrarNota(
-            dto.getAsignaturaId(),
-            dto.getAlumnoId(),
-            dto.getNombre(),
-            dto.getNota(),
-            dto.getPonderacion()
-        );
-        return ResponseEntity.ok(nuevaNota);
+        return ResponseEntity.ok(academicFacade.registrarNota(dto));
     }
 
     @GetMapping("/rendimiento/{asignaturaId}")
-    public ResponseEntity<Double> obtenerRendimiento(@PathVariable Long asignaturaId) {
-        Double promedio = academicFacade.obtenerPromedioRendimiento(asignaturaId);
-        return ResponseEntity.ok(promedio);
+    public ResponseEntity<RendimientoDTO> obtenerRendimiento(@PathVariable Long asignaturaId) {
+        return ResponseEntity.ok(academicFacade.obtenerRendimientoTotal(asignaturaId));
+    }
+
+    @GetMapping("/notas/alumno/{id}")
+    public ResponseEntity<List<Evaluacion>> listarNotasAlumno(@PathVariable Long id) {
+        return ResponseEntity.ok(academicFacade.obtenerNotasAlumno(id));
     }
 
     @PostMapping("/asignaturas")
     public ResponseEntity<Asignatura> crearAsignatura(@RequestBody AsignaturaDTO dto) {
-    Asignatura entidad = new Asignatura();
-    entidad.setNombreAsignatura(dto.getNombre());
-    entidad.setCurso(dto.getCurso());
-    Asignatura guardada = academicFacade.guardarAsignatura(entidad);
-    return ResponseEntity.ok(guardada);
+        Asignatura entidad = new Asignatura();
+        entidad.setNombreAsignatura(dto.getNombre());
+        entidad.setDocenteNombre(dto.getDocenteNombre());
+        return ResponseEntity.ok(academicFacade.guardarAsignatura(entidad));
     }
 
     @GetMapping("/asignaturas")
-    public ResponseEntity<List<Asignatura>  > listarAsignaturas() {
-    return ResponseEntity.ok(academicFacade.listarAsignaturas());
+    public ResponseEntity<List<Asignatura>> listarAsignaturas() {
+        return ResponseEntity.ok(academicFacade.listarAsignaturas());
     }
+
+    @PostMapping("/cursos")
+    public ResponseEntity<Curso> crearCurso(@RequestBody Curso curso) {
+        return ResponseEntity.ok(academicFacade.guardarCurso(curso));
+    }
+
+    @GetMapping("/cursos")
+    public ResponseEntity<List<Curso>> listarCursos() {
+        return ResponseEntity.ok(academicFacade.listarCursos());
+    }
+
+    @GetMapping("/cursos/{id}")
+    public ResponseEntity<Curso> obtenerCursoPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(academicFacade.obtenerCursoPorId(id));
+    }
+
 }

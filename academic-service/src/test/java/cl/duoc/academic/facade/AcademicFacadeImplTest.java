@@ -14,21 +14,23 @@ import java.util.Collections;
 @ExtendWith(MockitoExtension.class)
 public class AcademicFacadeImplTest {
 
-    @Mock private EvaluacionRepository evalRepo;
-    @InjectMocks private AcademicFacadeImpl academicFacade;
+    @Mock private AcademicaQueryService queryService;
+    @Mock private AcademicaCommandService commandService;
+
+    @InjectMocks
+    private AcademicFacadeImpl academicFacade;
 
     @Test
-    public void testObtenerPromedioRendimiento(){
+    public void testObtenerRendimientoTotal(){
+
         Long id = 1L;
-        Evaluacion e1 = new Evaluacion(); e1.setNota(6.0);
-        Evaluacion e2 = new Evaluacion(); e2.setNota(4.0);
-        when(evalRepo.findByAsignaturaId(id)).thenReturn(Arrays.asList(e1, e2));
-        Double promedio = academicFacade.obtenerPromedioRendimiento(id);
-        assertEquals(5.0, promedio, "El promedio debería ser 5.0");
-    }
-    public void testPromedioConNotasVacia() {
-        when(evalRepo.findByAsignaturaId(1L)).thenReturn(Collections.emptyList());
-        Double promedio = academicFacade.obtenerPromedioRendimiento(1L);
-        assertEquals(0.0, promedio);
+        RendimientoDTO mockDto = new RendimientoDTO(5.5, 3, "Aprobado");
+        when(queryService.obtenerRendimientoRico(id)).thenReturn(mockDto);
+
+        RendimientoDTO resultado = academicFacade.obtenerRendimientoTotal(id);
+
+        assertNotNull(resultado);
+        assertEquals(5.5, resultado.getPromedio());
+        verify(queryService, times(1)).obtenerRendimientoRico(id);
     }
 }
