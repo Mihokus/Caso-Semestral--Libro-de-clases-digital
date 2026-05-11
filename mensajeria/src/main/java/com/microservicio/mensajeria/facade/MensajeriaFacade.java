@@ -65,6 +65,13 @@ public class MensajeriaFacade {
         return mensajeriaQueryService.obtenerPorRemitente(usuarioId);
     }
 
+    public List<MensajeResponse> obtenerInboxUsuario(Long userId, Long cursoId) {
+        validarId(userId, "userId");
+        validarId(cursoId, "cursoId");
+
+        return mensajeriaQueryService.obtenerInbox(userId, cursoId);
+    }
+
     public MensajeResponse obtenerDetalleMensaje(Long mensajeId) {
         validarId(mensajeId, "mensajeId");
         return mensajeriaQueryService.obtenerPorId(mensajeId);

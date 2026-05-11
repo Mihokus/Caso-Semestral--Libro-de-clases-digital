@@ -31,4 +31,8 @@ public class MensajeriaQueryService {
     public List<MensajeResponse> obtenerPorRemitente(Long remitenteId) {
         return mensajeRepository.findMensajesDTOByRemitenteId(remitenteId);
     }
+
+    public List<MensajeResponse> obtenerInbox(Long userId, Long cursoId) {
+        return mensajeRepository.obtenerInboxUsuario(userId, cursoId);
+    }
 }

@@ -44,6 +44,14 @@ public class MensajeController {
         return mensajeriaFacade.obtenerHistorialUsuario(usuarioId);
     }
 
+    // Caso de uso: inbox combinado del usuario
+    @GetMapping("/inbox/{userId}")
+    public List<MensajeResponse> obtenerInboxUsuario(
+            @PathVariable Long userId,
+            @RequestParam Long cursoId) {
+        return mensajeriaFacade.obtenerInboxUsuario(userId, cursoId);
+    }
+
     // Caso de uso: detalle de un mensaje específico
     @GetMapping("/detalle/{mensajeId}")
     public MensajeResponse obtenerDetalleMensaje(@PathVariable Long mensajeId) {
