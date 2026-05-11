@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/mensajes")
-@CrossOrigin(origins = "*")
 public class MensajeController {
 
     private final MensajeriaFacade mensajeriaFacade;
@@ -43,6 +42,14 @@ public class MensajeController {
     @GetMapping("/historial/{usuarioId}")
     public List<MensajeResponse> obtenerHistorialUsuario(@PathVariable Long usuarioId) {
         return mensajeriaFacade.obtenerHistorialUsuario(usuarioId);
+    }
+
+    // Caso de uso: inbox combinado del usuario
+    @GetMapping("/inbox/{userId}")
+    public List<MensajeResponse> obtenerInboxUsuario(
+            @PathVariable Long userId,
+            @RequestParam Long cursoId) {
+        return mensajeriaFacade.obtenerInboxUsuario(userId, cursoId);
     }
 
     // Caso de uso: detalle de un mensaje específico

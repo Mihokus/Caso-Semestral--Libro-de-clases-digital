@@ -16,24 +16,13 @@ public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
             m.id,
             m.titulo,
             m.contenido,
+            m.cursoId,
+            m.remitenteId,
             m.remitenteNombre,
+            m.remitenteRol,
+            m.destinatarioId,
             m.destinatarioNombre,
-            m.tipoMensaje,
-            m.destinatarioTipo,
-            m.estado,
-            m.fechaEnvio
-        )
-        FROM Mensaje m
-    """)
-    List<MensajeResponse> findAllMensajesDTO();
-
-    @Query("""
-        SELECT new com.microservicio.mensajeria.dto.MensajeResponse(
-            m.id,
-            m.titulo,
-            m.contenido,
-            m.remitenteNombre,
-            m.destinatarioNombre,
+            m.destinatarioRol,
             m.tipoMensaje,
             m.destinatarioTipo,
             m.estado,
@@ -49,8 +38,13 @@ public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
             m.id,
             m.titulo,
             m.contenido,
+            m.cursoId,
+            m.remitenteId,
             m.remitenteNombre,
+            m.remitenteRol,
+            m.destinatarioId,
             m.destinatarioNombre,
+            m.destinatarioRol,
             m.tipoMensaje,
             m.destinatarioTipo,
             m.estado,
@@ -66,8 +60,13 @@ public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
             m.id,
             m.titulo,
             m.contenido,
+            m.cursoId,
+            m.remitenteId,
             m.remitenteNombre,
+            m.remitenteRol,
+            m.destinatarioId,
             m.destinatarioNombre,
+            m.destinatarioRol,
             m.tipoMensaje,
             m.destinatarioTipo,
             m.estado,
@@ -77,4 +76,28 @@ public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
         WHERE m.remitenteId = :remitenteId
     """)
     List<MensajeResponse> findMensajesDTOByRemitenteId(Long remitenteId);
+
+    @Query("""
+        SELECT new com.microservicio.mensajeria.dto.MensajeResponse(
+            m.id,
+            m.titulo,
+            m.contenido,
+            m.cursoId,
+            m.remitenteId,
+            m.remitenteNombre,
+            m.remitenteRol,
+            m.destinatarioId,
+            m.destinatarioNombre,
+            m.destinatarioRol,
+            m.tipoMensaje,
+            m.destinatarioTipo,
+            m.estado,
+            m.fechaEnvio
+        )
+        FROM Mensaje m
+        WHERE m.destinatarioId = :userId
+           OR m.cursoId = :cursoId
+           OR m.destinatarioTipo = com.microservicio.mensajeria.model.DestinatarioTipo.COMUNIDAD
+    """)
+    List<MensajeResponse> obtenerInboxUsuario(Long userId, Long cursoId);
 }

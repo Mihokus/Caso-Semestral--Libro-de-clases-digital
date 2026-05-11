@@ -7,19 +7,20 @@ import com.microservicio.mensajeria.model.EstadoMensaje;
 import com.microservicio.mensajeria.model.Mensaje;
 import com.microservicio.mensajeria.model.TipoMensaje;
 import com.microservicio.mensajeria.repository.MensajeRepository;
-import com.microservicio.mensajeria.service.MensajeService;
+import com.microservicio.mensajeria.service.MensajeriaCommandService;
 
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class MensajeServiceTest {
+public class MensajeriaCommandServiceTest {
 
     private final MensajeRepository repository = mock(MensajeRepository.class);
-    private final MensajeService service = new MensajeService(repository);
+    private final MensajeriaCommandService service = new MensajeriaCommandService(repository);
 
     @Test
     void crearMensaje_deberiaGuardarYRetornarDTO() {
@@ -27,10 +28,13 @@ public class MensajeServiceTest {
         MensajeRequest request = MensajeRequest.builder()
                 .titulo("Test")
                 .contenido("Contenido")
+                .cursoId(10L)
                 .remitenteId(1L)
                 .remitenteNombre("Profesor")
+                .remitenteRol("DOCENTE")
                 .destinatarioId(2L)
                 .destinatarioNombre("Apoderado")
+                .destinatarioRol("APODERADO")
                 .tipoMensaje(TipoMensaje.COMUNICADO_GENERAL)
                 .destinatarioTipo(DestinatarioTipo.COMUNIDAD)
                 .build();
@@ -46,8 +50,13 @@ public class MensajeServiceTest {
                         1L,
                         "Test",
                         "Contenido",
+                        10L,
+                        1L,
                         "Profesor",
+                        "DOCENTE",
+                        2L,
                         "Apoderado",
+                        "APODERADO",
                         TipoMensaje.COMUNICADO_GENERAL,
                         DestinatarioTipo.COMUNIDAD,
                         EstadoMensaje.ENVIADO,

@@ -9,14 +9,13 @@ import com.microservicio.mensajeria.repository.MensajeRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
-public class MensajeService {
+public class MensajeriaCommandService {
 
     private final MensajeRepository mensajeRepository;
 
-    public MensajeService(MensajeRepository mensajeRepository) {
+    public MensajeriaCommandService(MensajeRepository mensajeRepository) {
         this.mensajeRepository = mensajeRepository;
     }
 
@@ -24,10 +23,13 @@ public class MensajeService {
         Mensaje mensaje = Mensaje.builder()
                 .titulo(request.getTitulo())
                 .contenido(request.getContenido())
+                .cursoId(request.getCursoId())
                 .remitenteId(request.getRemitenteId())
                 .remitenteNombre(request.getRemitenteNombre())
+                .remitenteRol(request.getRemitenteRol())
                 .destinatarioId(request.getDestinatarioId())
                 .destinatarioNombre(request.getDestinatarioNombre())
+                .destinatarioRol(request.getDestinatarioRol())
                 .tipoMensaje(request.getTipoMensaje())
                 .destinatarioTipo(request.getDestinatarioTipo())
                 .estado(EstadoMensaje.ENVIADO)
@@ -42,26 +44,6 @@ public class MensajeService {
         }
 
         return response;
-    }
-
-    public List<MensajeResponse> listarMensajes() {
-        return mensajeRepository.findAllMensajesDTO();
-    }
-
-    public MensajeResponse obtenerPorId(Long id) {
-        MensajeResponse response = mensajeRepository.findMensajeDTOById(id);
-        if (response == null) {
-            throw new ResourceNotFoundException("Mensaje no encontrado con id: " + id);
-        }
-        return response;
-    }
-
-    public List<MensajeResponse> obtenerPorDestinatario(Long destinatarioId) {
-        return mensajeRepository.findMensajesDTOByDestinatarioId(destinatarioId);
-    }
-
-    public List<MensajeResponse> obtenerPorRemitente(Long remitenteId) {
-        return mensajeRepository.findMensajesDTOByRemitenteId(remitenteId);
     }
 
     public MensajeResponse marcarComoLeido(Long id) {
