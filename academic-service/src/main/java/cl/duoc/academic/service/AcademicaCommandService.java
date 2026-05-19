@@ -1,18 +1,30 @@
 package cl.duoc.academic.service;
+
+import cl.duoc.academic.dto.AsignaturaDTO;
+import cl.duoc.academic.dto.AsignaturaRequest;
+import cl.duoc.academic.dto.CursoDTO;
+import cl.duoc.academic.dto.CursoRequest;
+import cl.duoc.academic.dto.EvaluacionDTO;
+import cl.duoc.academic.dto.EvaluacionResponse;
+import cl.duoc.academic.model.Asignatura;
+import cl.duoc.academic.model.Curso;
+import cl.duoc.academic.model.Evaluacion;
+import cl.duoc.academic.repository.AsignaturaRepository;
+import cl.duoc.academic.repository.CursoRepository;
+import cl.duoc.academic.repository.EvaluacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import cl.duoc.academic.model.*;
-import cl.duoc.academic.repository.*;
-import cl.duoc.academic.dto.*;
+
 @Service
 public class AcademicaCommandService {
     @Autowired private EvaluacionRepository evalRepo;
     @Autowired private AsignaturaRepository asigRepo;
     @Autowired private CursoRepository cursoRepo;
+    @Autowired private AcademicaQueryService queryService;
 
-    public Evaluacion registrarNota (EvaluacionDTO dto){
+    public EvaluacionResponse registrarNota(EvaluacionDTO dto) {
         Asignatura asig = asigRepo.findById(dto.getAsignaturaId())
-        .orElseThrow(() -> new RuntimeException("Asignatura no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Asignatura no encontrada"));
 
         Evaluacion nueva = new Evaluacion();
         nueva.setAsignatura(asig);
@@ -25,13 +37,29 @@ public class AcademicaCommandService {
         nueva.setRegistradoPorId(dto.getRegistradoPorId());
         nueva.setRegistradoPorNombre(dto.getRegistradoPorNombre());
 
-        return evalRepo.save(nueva);
+        Evaluacion saved = evalRepo.save(nueva);
+        return queryService.toEvaluacionResponse(saved);
     }
 
-    public Curso guardarCurso(Curso curso){
-        return cursoRepo.save(curso);
+    public CursoDTO guardarCurso(CursoRequest req) {
+        Curso c = new Curso();
+        c.setNombre(req.getNombre());
+        c.setNivel(req.getNivel());
+        Curso saved = cursoRepo.save(c);
+        return queryService.toCursoDTO(saved);
     }
 
- 
-
+    public AsignaturaDTO guardarAsignatura(AsignaturaRequest req) {
+        Asignatura a = new Asignatura();
+        a.setNombreAsignatura(req.getNombre());
+        a.setDocenteId(req.getDocenteId());
+        a.setDocenteNombre(req.getDocenteNombre());
+        if (req.getCursoId() != null) {
+            Curso curso = cursoRepo.findById(req.getCursoId())
+                    .orElseThrow(() -> new RuntimeException("Curso no encontrado"));
+            a.setCurso(curso);
+        }
+        Asignatura saved = asigRepo.save(a);
+        return queryService.toAsignaturaDTO(saved);
+    }
 }
