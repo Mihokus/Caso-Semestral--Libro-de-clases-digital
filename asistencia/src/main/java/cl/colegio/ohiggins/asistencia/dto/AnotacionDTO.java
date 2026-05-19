@@ -1,16 +1,21 @@
 package cl.colegio.ohiggins.asistencia.dto;
 
+import cl.colegio.ohiggins.asistencia.model.TipoAnotacion;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
+
+import java.time.Instant;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class AnotacionDTO {
-    private String rutEstudiante;
-    private String tipo; // "POSITIVA" o "NEGATIVA"
+    private Long id;
+    private Long alumnoId;
+    private String alumnoNombre;
+    private TipoAnotacion tipo;
     private String descripcion;
-    private LocalDate fecha;
+    private Instant fecha;
+    private RegistradoPor registradoPor;
 }
