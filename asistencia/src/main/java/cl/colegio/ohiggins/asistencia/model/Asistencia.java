@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Entity
@@ -16,12 +17,21 @@ public class Asistencia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "rut_estudiante", nullable = false)
-    private String rutEstudiante;
+    @Column(nullable = false)
+    private Long alumnoId;
+
+    private String alumnoNombre;
+
+    private Long cursoId;
+    private String cursoNombre;
 
     @Column(nullable = false)
     private LocalDate fecha;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String estado;
+    private EstadoAsistencia estado;
+
+    private Long registradoPorId;
+    private String registradoPorNombre;
 }

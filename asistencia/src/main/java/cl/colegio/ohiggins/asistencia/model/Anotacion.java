@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "anotaciones")
@@ -16,15 +17,21 @@ public class Anotacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "rut_estudiante", nullable = false)
-    private String rutEstudiante;
-
     @Column(nullable = false)
-    private String tipo;
+    private Long alumnoId;
+
+    private String alumnoNombre;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoAnotacion tipo;
 
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
     @Column(nullable = false)
-    private LocalDate fecha;
+    private Instant fecha;
+
+    private Long registradoPorId;
+    private String registradoPorNombre;
 }
