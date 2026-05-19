@@ -4,7 +4,15 @@ import com.microservicio.mensajeria.dto.MensajeRequest;
 import com.microservicio.mensajeria.dto.MensajeResponse;
 import com.microservicio.mensajeria.facade.MensajeriaFacade;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -18,56 +26,41 @@ public class MensajeController {
         this.mensajeriaFacade = mensajeriaFacade;
     }
 
-    // Caso de uso: publicar mensajes masivos a la comunidad educativa
-    @PostMapping("/difusion")
+    @PostMapping("/comunicado")
     @ResponseStatus(HttpStatus.CREATED)
-    public MensajeResponse publicarMensajeDifusion(@RequestBody MensajeRequest request) {
-        return mensajeriaFacade.publicarMensajeDifusion(request);
+    public MensajeResponse publicarComunicado(@RequestBody MensajeRequest request) {
+        return mensajeriaFacade.publicarComunicado(request);
     }
 
-    // Caso de uso: enviar comunicación directa entre usuarios
-    @PostMapping("/conversacion/directa")
+    @PostMapping("/directo")
     @ResponseStatus(HttpStatus.CREATED)
-    public MensajeResponse enviarComunicacionDirecta(@RequestBody MensajeRequest request) {
-        return mensajeriaFacade.enviarComunicacionDirecta(request);
+    public MensajeResponse enviarDirecto(@RequestBody MensajeRequest request) {
+        return mensajeriaFacade.enviarDirecto(request);
     }
 
-    // Caso de uso: bandeja general de un usuario
-    @GetMapping("/bandeja/{usuarioId}")
-    public List<MensajeResponse> obtenerBandejaUsuario(@PathVariable Long usuarioId) {
-        return mensajeriaFacade.obtenerBandejaUsuario(usuarioId);
-    }
-
-    // Caso de uso: historial de mensajes enviados por un usuario
-    @GetMapping("/historial/{usuarioId}")
-    public List<MensajeResponse> obtenerHistorialUsuario(@PathVariable Long usuarioId) {
-        return mensajeriaFacade.obtenerHistorialUsuario(usuarioId);
-    }
-
-    // Caso de uso: inbox combinado del usuario
     @GetMapping("/inbox/{userId}")
-    public List<MensajeResponse> obtenerInboxUsuario(
-            @PathVariable Long userId,
-            @RequestParam Long cursoId) {
-        return mensajeriaFacade.obtenerInboxUsuario(userId, cursoId);
+    public List<MensajeResponse> obtenerInbox(@PathVariable Long userId) {
+        return mensajeriaFacade.obtenerInbox(userId);
     }
 
-    // Caso de uso: detalle de un mensaje específico
-    @GetMapping("/detalle/{mensajeId}")
-    public MensajeResponse obtenerDetalleMensaje(@PathVariable Long mensajeId) {
-        return mensajeriaFacade.obtenerDetalleMensaje(mensajeId);
+    @GetMapping("/remitente/{userId}")
+    public List<MensajeResponse> obtenerEnviadosPorRemitente(@PathVariable Long userId) {
+        return mensajeriaFacade.obtenerEnviadosPorRemitente(userId);
     }
 
-    // Caso de uso: registrar lectura del mensaje
-    @PutMapping("/{mensajeId}/registrar-lectura")
-    public MensajeResponse registrarLecturaMensaje(@PathVariable Long mensajeId) {
-        return mensajeriaFacade.registrarLecturaMensaje(mensajeId);
+    @GetMapping("/{id}")
+    public MensajeResponse obtenerDetalleMensaje(@PathVariable Long id) {
+        return mensajeriaFacade.obtenerDetalleMensaje(id);
     }
 
-    // Caso de uso: archivar o eliminar mensaje
-    @DeleteMapping("/{mensajeId}")
+    @PutMapping("/{id}/leido")
+    public MensajeResponse registrarLecturaMensaje(@PathVariable Long id) {
+        return mensajeriaFacade.registrarLecturaMensaje(id);
+    }
+
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminarMensaje(@PathVariable Long mensajeId) {
-        mensajeriaFacade.eliminarMensaje(mensajeId);
+    public void eliminarMensaje(@PathVariable Long id) {
+        mensajeriaFacade.eliminarMensaje(id);
     }
 }

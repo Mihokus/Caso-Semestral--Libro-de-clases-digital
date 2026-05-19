@@ -2,37 +2,43 @@ package com.microservicio.mensajeria.service;
 
 import com.microservicio.mensajeria.dto.MensajeResponse;
 import com.microservicio.mensajeria.exception.ResourceNotFoundException;
+import com.microservicio.mensajeria.model.Mensaje;
+import com.microservicio.mensajeria.model.TipoMensaje;
 import com.microservicio.mensajeria.repository.MensajeRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class MensajeriaQueryService {
 
     private final MensajeRepository mensajeRepository;
+    private final MensajeMapper mapper;
 
-    public MensajeriaQueryService(MensajeRepository mensajeRepository) {
+    public MensajeriaQueryService(MensajeRepository mensajeRepository, MensajeMapper mapper) {
         this.mensajeRepository = mensajeRepository;
+        this.mapper = mapper;
     }
 
     public MensajeResponse obtenerPorId(Long id) {
-        MensajeResponse response = mensajeRepository.findMensajeDTOById(id);
-        if (response == null) {
-            throw new ResourceNotFoundException("Mensaje no encontrado con id: " + id);
-        }
-        return response;
-    }
-
-    public List<MensajeResponse> obtenerPorDestinatario(Long destinatarioId) {
-        return mensajeRepository.findMensajesDTOByDestinatarioId(destinatarioId);
+        Mensaje m = mensajeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mensaje no encontrado con id: " + id));
+        return mapper.toResponse(m);
     }
 
     public List<MensajeResponse> obtenerPorRemitente(Long remitenteId) {
-        return mensajeRepository.findMensajesDTOByRemitenteId(remitenteId);
+        return map(mensajeRepository.findByRemitenteIdOrderByFechaEnvioDesc(remitenteId));
     }
 
-    public List<MensajeResponse> obtenerInbox(Long userId, Long cursoId) {
-        return mensajeRepository.obtenerInboxUsuario(userId, cursoId);
+    public List<MensajeResponse> obtenerInbox(Long userId) {
+        return map(mensajeRepository
+                .findByDestinatarioIdOrTipoMensajeOrderByFechaEnvioDesc(userId, TipoMensaje.COMUNICADO));
+    }
+
+    private List<MensajeResponse> map(List<Mensaje> list) {
+        List<MensajeResponse> out = new ArrayList<>(list.size());
+        for (Mensaje m : list) out.add(mapper.toResponse(m));
+        return out;
     }
 }

@@ -1,18 +1,19 @@
 package com.microservicio.mensajeria;
 
 import com.microservicio.mensajeria.dto.MensajeRequest;
-import com.microservicio.mensajeria.model.DestinatarioTipo;
+import com.microservicio.mensajeria.facade.MensajeriaFacade;
 import com.microservicio.mensajeria.model.TipoMensaje;
 import com.microservicio.mensajeria.service.MensajeriaCommandService;
 import com.microservicio.mensajeria.service.MensajeriaQueryService;
-import com.microservicio.mensajeria.facade.MensajeriaFacade;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 public class MensajeriaFacadeTest {
 
@@ -21,23 +22,21 @@ public class MensajeriaFacadeTest {
     private final MensajeriaFacade facade = new MensajeriaFacade(commandService, queryService);
 
     @Test
-    void publicarMensajeDifusion_deberiaFallarSiNoHayCursoId() {
+    void publicarComunicadoFallaSinCursoId() {
         MensajeRequest request = MensajeRequest.builder()
                 .titulo("Test")
                 .contenido("Contenido")
                 .remitenteId(1L)
                 .remitenteNombre("Profesor")
                 .remitenteRol("DOCENTE")
-                .tipoMensaje(TipoMensaje.COMUNICADO_GENERAL)
-                .destinatarioTipo(DestinatarioTipo.COMUNIDAD)
                 .build();
 
-        assertThrows(IllegalArgumentException.class, () -> facade.publicarMensajeDifusion(request));
+        assertThrows(IllegalArgumentException.class, () -> facade.publicarComunicado(request));
         verifyNoInteractions(commandService);
     }
 
     @Test
-    void publicarMensajeDifusion_deberiaDelegarAlCommandService() {
+    void publicarComunicadoDelegaAlCommandService() {
         MensajeRequest request = MensajeRequest.builder()
                 .titulo("Test")
                 .contenido("Contenido")
@@ -45,13 +44,25 @@ public class MensajeriaFacadeTest {
                 .remitenteId(1L)
                 .remitenteNombre("Profesor")
                 .remitenteRol("DOCENTE")
-                .tipoMensaje(TipoMensaje.COMUNICADO_GENERAL)
-                .destinatarioTipo(DestinatarioTipo.COMUNIDAD)
                 .build();
 
-        facade.publicarMensajeDifusion(request);
+        facade.publicarComunicado(request);
 
-        verify(commandService, times(1)).crearMensaje(any(MensajeRequest.class));
+        verify(commandService, times(1)).crearMensaje(any(MensajeRequest.class), eq(TipoMensaje.COMUNICADO));
         verifyNoInteractions(queryService);
+    }
+
+    @Test
+    void enviarDirectoFallaSinDestinatarioId() {
+        MensajeRequest request = MensajeRequest.builder()
+                .titulo("Test")
+                .contenido("Contenido")
+                .remitenteId(1L)
+                .remitenteNombre("Profesor")
+                .remitenteRol("DOCENTE")
+                .build();
+
+        assertThrows(IllegalArgumentException.class, () -> facade.enviarDirecto(request));
+        verifyNoInteractions(commandService);
     }
 }

@@ -2,72 +2,53 @@ package com.microservicio.mensajeria;
 
 import com.microservicio.mensajeria.dto.MensajeRequest;
 import com.microservicio.mensajeria.dto.MensajeResponse;
-import com.microservicio.mensajeria.model.DestinatarioTipo;
 import com.microservicio.mensajeria.model.EstadoMensaje;
 import com.microservicio.mensajeria.model.Mensaje;
 import com.microservicio.mensajeria.model.TipoMensaje;
 import com.microservicio.mensajeria.repository.MensajeRepository;
+import com.microservicio.mensajeria.service.MensajeMapper;
 import com.microservicio.mensajeria.service.MensajeriaCommandService;
-
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class MensajeriaCommandServiceTest {
 
     private final MensajeRepository repository = mock(MensajeRepository.class);
-    private final MensajeriaCommandService service = new MensajeriaCommandService(repository);
+    private final MensajeMapper mapper = new MensajeMapper();
+    private final MensajeriaCommandService service = new MensajeriaCommandService(repository, mapper);
 
     @Test
-    void crearMensaje_deberiaGuardarYRetornarDTO() {
-
+    void crearMensajeDirectoGuardaYRetornaDTO() {
         MensajeRequest request = MensajeRequest.builder()
                 .titulo("Test")
                 .contenido("Contenido")
-                .cursoId(10L)
                 .remitenteId(1L)
                 .remitenteNombre("Profesor")
                 .remitenteRol("DOCENTE")
                 .destinatarioId(2L)
                 .destinatarioNombre("Apoderado")
                 .destinatarioRol("APODERADO")
-                .tipoMensaje(TipoMensaje.COMUNICADO_GENERAL)
-                .destinatarioTipo(DestinatarioTipo.COMUNIDAD)
                 .build();
 
-        when(repository.save(any())).thenAnswer(invocation -> {
-            Mensaje mensaje = invocation.getArgument(0);
-            mensaje.setId(1L);
-            return mensaje;
+        when(repository.save(any(Mensaje.class))).thenAnswer(invocation -> {
+            Mensaje m = invocation.getArgument(0);
+            m.setId(1L);
+            m.setEstado(EstadoMensaje.ENVIADO);
+            return m;
         });
 
-        when(repository.findMensajeDTOById(1L)).thenReturn(
-                new MensajeResponse(
-                        1L,
-                        "Test",
-                        "Contenido",
-                        10L,
-                        1L,
-                        "Profesor",
-                        "DOCENTE",
-                        2L,
-                        "Apoderado",
-                        "APODERADO",
-                        TipoMensaje.COMUNICADO_GENERAL,
-                        DestinatarioTipo.COMUNIDAD,
-                        EstadoMensaje.ENVIADO,
-                        LocalDateTime.now()
-                )
-        );
-
-        MensajeResponse response = service.crearMensaje(request);
+        MensajeResponse response = service.crearMensaje(request, TipoMensaje.DIRECTO);
 
         assertNotNull(response);
-        verify(repository, times(1)).save(any());
-        verify(repository, times(1)).findMensajeDTOById(1L);
+        assertEquals(TipoMensaje.DIRECTO, response.getTipo());
+        assertEquals(1L, response.getId());
+        verify(repository, times(1)).save(any(Mensaje.class));
     }
 }

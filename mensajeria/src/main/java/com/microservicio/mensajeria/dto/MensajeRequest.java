@@ -1,8 +1,10 @@
 package com.microservicio.mensajeria.dto;
 
-import com.microservicio.mensajeria.model.DestinatarioTipo;
-import com.microservicio.mensajeria.model.TipoMensaje;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -10,7 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class MensajeRequest {
-
     private String titulo;
     private String contenido;
 
@@ -19,11 +20,8 @@ public class MensajeRequest {
     private String remitenteRol;
 
     private Long destinatarioId;
-    private Long cursoId;
     private String destinatarioNombre;
     private String destinatarioRol;
 
-    private TipoMensaje tipoMensaje;
-    private DestinatarioTipo destinatarioTipo;
-
+    private Long cursoId;
 }
