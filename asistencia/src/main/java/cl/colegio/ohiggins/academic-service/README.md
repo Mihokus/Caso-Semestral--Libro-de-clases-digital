@@ -1,0 +1,1 @@
+El microservicio de mensajería permite gestionar la comunicación dentro de la comunidad educativa, facilitando la publicación de comunicados institucionales y el envío de mensajes directos entre docentes, estudiantes y apoderados, centralizando la información y mejorando la interacción entre los distintos actores del sistema.
