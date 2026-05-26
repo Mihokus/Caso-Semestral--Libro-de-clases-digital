@@ -1,9 +1,0 @@
-spring:
-  jpa:
-    show-sql: false
-
-logging:
-  level:
-    com.libroclases: INFO
-    org.springframework: WARN
-    org.springframework.security: INFO
