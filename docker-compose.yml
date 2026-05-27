@@ -1,0 +1,164 @@
+name: libroclases
+
+services:
+  # ---------------------- DATABASES ----------------------
+  gateway-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gateway_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - gateway_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gateway_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  asistencia-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: asistencia
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - asistencia_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d asistencia"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  mensajeria-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: mensajeria_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    volumes:
+      - mensajeria_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mensajeria_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  academic-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: academic_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123456"
+    volumes:
+      - academic_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d academic_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  # ---------------------- SERVICES ----------------------
+  asistencia-app:
+    build: ./asistencia
+    depends_on:
+      asistencia-db:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://asistencia-db:5432/asistencia
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    restart: unless-stopped
+
+  mensajeria-app:
+    build: ./mensajeria
+    depends_on:
+      mensajeria-db:
+        condition: service_healthy
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://mensajeria-db:5432/mensajeria_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "1234"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    restart: unless-stopped
+
+  academic-service:
+    build: ./academic-service
+    depends_on:
+      academic-db:
+        condition: service_healthy
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://academic-db:5432/academic_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123456"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    restart: unless-stopped
+
+  bff:
+    build: ./bff
+    depends_on:
+      - asistencia-app
+      - mensajeria-app
+      - academic-service
+    ports:
+      - "8085:8085"
+    environment:
+      SERVER_PORT: 8085
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      ASISTENCIA_URL: http://asistencia-app:8081
+      MENSAJERIA_URL: http://mensajeria-app:8083
+      ACADEMICA_URL: http://academic-service:8084
+    restart: unless-stopped
+
+  api-gateway:
+    build: ./api-gateway
+    depends_on:
+      gateway-db:
+        condition: service_healthy
+      bff:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      DB_URL: jdbc:postgresql://gateway-db:5432/gateway_db
+      DB_USER: postgres
+      DB_PASS: postgres
+      BFF_URL: http://bff:8085
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me-this-needs-to-be-at-least-32-bytes-long-for-hs256}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+    restart: unless-stopped
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - api-gateway
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+      CHOKIDAR_USEPOLLING: "true"
+    restart: unless-stopped
+
+volumes:
+  gateway_db_data:
+  asistencia_db_data:
+  mensajeria_db_data:
+  academic_db_data:
+  frontend_node_modules:
