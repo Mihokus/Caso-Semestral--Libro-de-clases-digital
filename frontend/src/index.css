@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  body {
+    @apply bg-gray-100 text-gray-900;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  h1 { @apply text-2xl font-bold mb-3; }
+  h2 { @apply text-xl font-semibold mb-2 mt-3; }
+  h3 { @apply text-lg font-semibold mb-2 mt-2; }
+  table { @apply border-collapse border border-gray-400 w-full text-sm my-2; }
+  th { @apply border border-gray-400 px-2 py-1 bg-gray-200 text-left; }
+  td { @apply border border-gray-400 px-2 py-1; }
+  input, textarea, select {
+    @apply border border-gray-400 px-2 py-1 rounded text-sm;
+  }
+  label {
+    @apply block text-sm font-medium mt-2 mb-1;
+  }
+  fieldset {
+    @apply border border-gray-300 rounded p-2 my-2;
+  }
+  legend {
+    @apply px-2 text-sm font-medium;
+  }
+  hr {
+    @apply my-3 border-gray-300;
+  }
+  a {
+    @apply text-blue-700 hover:underline;
+  }
+}
+
+@layer components {
+  .btn { @apply px-3 py-1 rounded inline-block text-sm; }
+  .btn-primary { @apply bg-blue-600 text-white hover:bg-blue-700; }
+  .btn-secondary { @apply bg-gray-300 text-gray-900 hover:bg-gray-400; }
+  .btn-danger { @apply bg-red-600 text-white hover:bg-red-700; }
+  button:disabled { @apply opacity-50 cursor-not-allowed; }
+  .card { @apply bg-white border border-gray-300 rounded p-4; }
+  .row { @apply flex flex-wrap gap-2 items-end; }
+  .stat-label { @apply text-xs text-gray-600 uppercase; }
+  .stat-value { @apply text-2xl font-bold; }
+  .tab-btn { @apply px-3 py-1 text-sm text-gray-600 border-b-2 border-transparent; }
+  .tab-active { @apply border-blue-600 text-blue-700 font-medium; }
+}
