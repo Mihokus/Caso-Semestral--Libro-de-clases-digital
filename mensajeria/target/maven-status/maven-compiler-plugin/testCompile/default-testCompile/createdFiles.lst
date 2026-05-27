@@ -1,0 +1,3 @@
+com\microservicio\mensajeria\MensajeriaApplicationTests.class
+com\microservicio\mensajeria\MensajeriaFacadeTest.class
+com\microservicio\mensajeria\MensajeriaCommandServiceTest.class
