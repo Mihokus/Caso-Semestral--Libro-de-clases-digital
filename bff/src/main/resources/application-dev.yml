@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 2000
+            read-timeout: 5000
+            logger-level: FULL
+
+logging:
+  level:
+    com.libroclases: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
