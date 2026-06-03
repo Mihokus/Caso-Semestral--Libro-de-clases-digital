@@ -2,8 +2,15 @@ import { type FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth, type Role } from "@libroclases/api-client";
 import { useAuthStore } from "@/store/auth";
+import Alert from "@/components/Alert";
+import Spinner from "@/components/Spinner";
 
-const ROLES: Role[] = ["DOCENTE", "APODERADO", "ESTUDIANTE", "ADMIN"];
+const ROLES: { value: Role; label: string; emoji: string }[] = [
+  { value: "DOCENTE", label: "Docente", emoji: "🧑‍🏫" },
+  { value: "APODERADO", label: "Apoderado", emoji: "👨‍👧" },
+  { value: "ESTUDIANTE", label: "Estudiante", emoji: "🎓" },
+  { value: "ADMIN", label: "Administrador", emoji: "🔐" },
+];
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -41,30 +48,37 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="card w-full max-w-md">
-        <h1>Registrar</h1>
+    <div className="min-h-screen flex items-center justify-center p-4"
+      style={{ background: "linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%)" }}>
+      <div className="card w-full max-w-md !p-8">
+        <div className="text-center mb-6">
+          <div className="text-2xl font-bold text-violet-950">Crear cuenta</div>
+          <div className="text-sm text-violet-500 mt-1">Libro de Clases · Colegio B. O'Higgins</div>
+        </div>
         <form onSubmit={onSubmit}>
-          <label>Email</label>
+          <label>Correo electrónico</label>
           <input
             className="w-full"
             type="email"
+            placeholder="usuario@colegio.cl"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <label>Nombre</label>
+          <label>Nombre completo</label>
           <input
             className="w-full"
             type="text"
+            placeholder="Nombre y apellido"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             required
           />
-          <label>Password</label>
+          <label>Contraseña</label>
           <input
             className="w-full"
             type="password"
+            placeholder="Mínimo 6 caracteres"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             minLength={6}
@@ -77,31 +91,28 @@ export default function RegisterPage() {
             onChange={(e) => setRole(e.target.value as Role)}
           >
             {ROLES.map((r) => (
-              <option key={r} value={r}>
-                {r}
+              <option key={r.value} value={r.value}>
+                {r.emoji} {r.label}
               </option>
             ))}
           </select>
-          <label>Entity ID (opcional, alumnoId/docenteId/apoderadoId)</label>
+          <label>ID asociado <span className="text-slate-400 font-normal">(opcional: alumno/docente/apoderado)</span></label>
           <input
             className="w-full"
             type="number"
+            placeholder="Ej: 1"
             value={entityId}
             onChange={(e) => setEntityId(e.target.value)}
           />
-          <div className="mt-4">
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? "Registrando..." : "Registrar"}
+          <div className="mt-5">
+            <button type="submit" className="btn btn-primary w-full !py-2.5" disabled={loading}>
+              {loading ? <Spinner text="Registrando..." /> : "Registrar"}
             </button>
           </div>
         </form>
-        {error && (
-          <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-3 text-sm">
-            {error}
-          </p>
-        )}
-        <p className="text-sm mt-3">
-          <Link to="/login">Volver al login</Link>
+        <Alert type="error" message={error} onClose={() => setError(null)} />
+        <p className="text-sm mt-4 text-center text-slate-500">
+          <Link to="/login" className="text-violet-700 font-medium">← Volver al login</Link>
         </p>
       </div>
     </div>
