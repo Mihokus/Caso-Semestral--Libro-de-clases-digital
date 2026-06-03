@@ -9,45 +9,58 @@
     height: 100%;
   }
   body {
-    @apply bg-gray-100 text-gray-900;
+    @apply bg-violet-50 text-slate-900;
     font-family: system-ui, -apple-system, sans-serif;
   }
-  h1 { @apply text-2xl font-bold mb-3; }
-  h2 { @apply text-xl font-semibold mb-2 mt-3; }
-  h3 { @apply text-lg font-semibold mb-2 mt-2; }
-  table { @apply border-collapse border border-gray-400 w-full text-sm my-2; }
-  th { @apply border border-gray-400 px-2 py-1 bg-gray-200 text-left; }
-  td { @apply border border-gray-400 px-2 py-1; }
+  h1 { @apply text-2xl font-bold mb-3 text-violet-950; }
+  h2 { @apply text-xl font-semibold mb-2 mt-3 text-violet-950; }
+  h3 { @apply text-lg font-semibold mb-2 mt-2 text-violet-900; }
+  table { @apply border-collapse w-full text-sm my-2; }
+  th { @apply px-3 py-2 bg-violet-50 text-left text-xs font-semibold text-violet-700 uppercase tracking-wider border-b-2 border-violet-200; }
+  td { @apply px-3 py-2 border-b border-violet-100; }
+  tr:hover td { @apply bg-violet-50/50; }
+  tbody tr:nth-child(even) td { @apply bg-violet-50/30; }
   input, textarea, select {
-    @apply border border-gray-400 px-2 py-1 rounded text-sm;
+    @apply border border-slate-300 px-3 py-2 rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400;
   }
   label {
-    @apply block text-sm font-medium mt-2 mb-1;
+    @apply block text-sm font-medium mt-2 mb-1 text-slate-700;
   }
   fieldset {
-    @apply border border-gray-300 rounded p-2 my-2;
+    @apply border border-violet-200 rounded-lg p-3 my-2;
   }
   legend {
-    @apply px-2 text-sm font-medium;
+    @apply px-2 text-sm font-medium text-violet-700;
   }
   hr {
-    @apply my-3 border-gray-300;
+    @apply my-4 border-violet-200;
   }
   a {
-    @apply text-blue-700 hover:underline;
+    @apply text-violet-700 hover:text-violet-900 hover:underline;
   }
 }
 
 @layer components {
-  .btn { @apply px-3 py-1 rounded inline-block text-sm; }
-  .btn-primary { @apply bg-blue-600 text-white hover:bg-blue-700; }
-  .btn-secondary { @apply bg-gray-300 text-gray-900 hover:bg-gray-400; }
+  .btn { @apply px-4 py-2 rounded-lg inline-flex items-center justify-center text-sm font-medium transition-colors cursor-pointer; }
+  .btn-primary { @apply bg-violet-700 text-white hover:bg-violet-800 active:bg-violet-900; }
+  .btn-secondary { @apply bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300; }
   .btn-danger { @apply bg-red-600 text-white hover:bg-red-700; }
   button:disabled { @apply opacity-50 cursor-not-allowed; }
-  .card { @apply bg-white border border-gray-300 rounded p-4; }
-  .row { @apply flex flex-wrap gap-2 items-end; }
-  .stat-label { @apply text-xs text-gray-600 uppercase; }
-  .stat-value { @apply text-2xl font-bold; }
-  .tab-btn { @apply px-3 py-1 text-sm text-gray-600 border-b-2 border-transparent; }
-  .tab-active { @apply border-blue-600 text-blue-700 font-medium; }
+  .card { @apply bg-white border border-violet-100 rounded-xl p-5 shadow-sm; }
+  .row { @apply flex flex-wrap gap-3 items-end; }
+  .stat-label { @apply text-xs text-violet-600 uppercase font-semibold tracking-wide; }
+  .stat-value { @apply text-2xl font-bold text-violet-950; }
+  .tab-btn { @apply px-4 py-2 text-sm text-slate-500 border-b-2 border-transparent transition-colors hover:text-violet-600; }
+  .tab-active { @apply border-violet-600 text-violet-700 font-medium; }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .spinner {
+    @apply inline-block w-5 h-5 border-2 border-violet-200 border-t-violet-600 rounded-full;
+    animation: spin 0.6s linear infinite;
+  }
+  .spinner-lg {
+    @apply w-8 h-8;
+  }
 }
