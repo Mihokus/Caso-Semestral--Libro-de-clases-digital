@@ -1,11 +1,17 @@
 import { type FormEvent, useEffect, useState } from "react";
 import {
   academica,
+  asistencia,
+  type AlumnoDTO,
   type AsignaturaDTO,
   type CursoDTO,
   type EvaluacionDTO,
   type RendimientoDTO,
 } from "@libroclases/api-client";
+import Alert from "@/components/Alert";
+import Spinner from "@/components/Spinner";
+import EmptyState from "@/components/EmptyState";
+import { GradeBadge } from "@/components/StatusBadge";
 
 type Tab = "asignaturas" | "cursos" | "notas" | "rendimiento";
 
@@ -15,18 +21,18 @@ export default function AcademicaPage() {
   return (
     <div>
       <h1>Académica</h1>
-      <div className="border-b border-gray-300 flex gap-1 mb-4">
+      <div className="border-b border-violet-200 flex gap-1 mb-4 flex-wrap">
         <TabBtn active={tab === "asignaturas"} onClick={() => setTab("asignaturas")}>
-          Asignaturas
+          📚 Asignaturas
         </TabBtn>
         <TabBtn active={tab === "cursos"} onClick={() => setTab("cursos")}>
-          Cursos
+          🏫 Cursos
         </TabBtn>
         <TabBtn active={tab === "notas"} onClick={() => setTab("notas")}>
-          Notas
+          📝 Notas
         </TabBtn>
         <TabBtn active={tab === "rendimiento"} onClick={() => setTab("rendimiento")}>
-          Rendimiento
+          📈 Rendimiento
         </TabBtn>
       </div>
       {tab === "asignaturas" && <AsignaturasTab />}
@@ -55,18 +61,23 @@ function TabBtn({
 
 function AsignaturasTab() {
   const [data, setData] = useState<AsignaturaDTO[]>([]);
+  const [cursos, setCursos] = useState<CursoDTO[]>([]);
   const [nombre, setNombre] = useState("");
   const [cursoId, setCursoId] = useState("");
   const [docenteId, setDocenteId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   async function cargar() {
     setError(null);
+    setLoading(true);
     try {
       setData(await academica.listAsignaturas());
     } catch (e: unknown) {
       setError((e as Error).message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -82,7 +93,6 @@ function AsignaturasTab() {
       });
       setMsg("Asignatura creada");
       setNombre("");
-      setCursoId("");
       setDocenteId("");
       cargar();
     } catch (err: unknown) {
@@ -92,30 +102,35 @@ function AsignaturasTab() {
 
   useEffect(() => {
     cargar();
+    academica.listCursos().then((cs) => {
+      setCursos(cs);
+      if (cs.length > 0) setCursoId(String(cs[0].id));
+    }).catch(() => { /* opcional */ });
   }, []);
 
   return (
     <div className="card">
       <h2>Asignaturas</h2>
-      <form onSubmit={crear} className="mb-3">
+      <form onSubmit={crear} className="mb-4">
         <div className="row">
           <div>
             <label>Nombre</label>
             <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
           </div>
           <div>
-            <label>Curso ID</label>
-            <input
-              type="number"
-              value={cursoId}
-              onChange={(e) => setCursoId(e.target.value)}
-              required
-            />
+            <label>Curso</label>
+            <select value={cursoId} onChange={(e) => setCursoId(e.target.value)} required>
+              {cursos.length === 0 && <option value="">(sin cursos)</option>}
+              {cursos.map((c) => (
+                <option key={c.id} value={c.id}>{c.nombre} — {c.nivel}</option>
+              ))}
+            </select>
           </div>
           <div>
-            <label>Docente ID</label>
+            <label>Docente (ID)</label>
             <input
               type="number"
+              placeholder="Ej: 2"
               value={docenteId}
               onChange={(e) => setDocenteId(e.target.value)}
               required
@@ -126,33 +141,34 @@ function AsignaturasTab() {
           </button>
         </div>
       </form>
-      <Box error={error} msg={msg} />
-      <button onClick={cargar} className="btn btn-secondary mb-2">
-        Recargar lista
-      </button>
-      {data.length === 0 ? (
-        <p className="text-sm text-gray-600">(sin asignaturas)</p>
+      <Alert type="error" message={error} onClose={() => setError(null)} />
+      <Alert type="success" message={msg} onClose={() => setMsg(null)} />
+      {loading && <Spinner text="Cargando asignaturas..." />}
+      {!loading && data.length === 0 ? (
+        <EmptyState emoji="📚" message="Sin asignaturas" />
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Curso</th>
-              <th>Docente</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((a) => (
-              <tr key={a.id}>
-                <td>{a.id}</td>
-                <td>{a.nombre}</td>
-                <td>{a.cursoNombre}</td>
-                <td>{a.docenteNombre}</td>
+        !loading && (
+          <table>
+            <thead>
+              <tr>
+                <th className="w-16">ID</th>
+                <th>Nombre</th>
+                <th>Curso</th>
+                <th>Docente</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.map((a) => (
+                <tr key={a.id}>
+                  <td className="text-slate-400">{a.id}</td>
+                  <td className="font-medium">{a.nombre}</td>
+                  <td>{a.cursoNombre}</td>
+                  <td>{a.docenteNombre}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )
       )}
     </div>
   );
@@ -163,13 +179,18 @@ function CursosTab() {
   const [nombre, setNombre] = useState("");
   const [nivel, setNivel] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   async function cargar() {
     setError(null);
+    setLoading(true);
     try {
       setData(await academica.listCursos());
     } catch (e: unknown) {
       setError((e as Error).message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -177,6 +198,7 @@ function CursosTab() {
     e.preventDefault();
     try {
       await academica.crearCurso({ nombre, nivel });
+      setMsg("Curso creado");
       setNombre("");
       setNivel("");
       cargar();
@@ -192,7 +214,7 @@ function CursosTab() {
   return (
     <div className="card">
       <h2>Cursos</h2>
-      <form onSubmit={crear} className="mb-3">
+      <form onSubmit={crear} className="mb-4">
         <div className="row">
           <div>
             <label>Nombre (ej. 8°A)</label>
@@ -207,40 +229,43 @@ function CursosTab() {
           </button>
         </div>
       </form>
-      <Box error={error} msg={null} />
-      <button onClick={cargar} className="btn btn-secondary mb-2">
-        Recargar
-      </button>
-      {data.length === 0 ? (
-        <p className="text-sm text-gray-600">(sin cursos)</p>
+      <Alert type="error" message={error} onClose={() => setError(null)} />
+      <Alert type="success" message={msg} onClose={() => setMsg(null)} />
+      {loading && <Spinner text="Cargando cursos..." />}
+      {!loading && data.length === 0 ? (
+        <EmptyState emoji="🏫" message="Sin cursos" />
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Nivel</th>
-              <th>Alumnos</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((c) => (
-              <tr key={c.id}>
-                <td>{c.id}</td>
-                <td>{c.nombre}</td>
-                <td>{c.nivel}</td>
-                <td>{c.cantidadAlumnos ?? "?"}</td>
+        !loading && (
+          <table>
+            <thead>
+              <tr>
+                <th className="w-16">ID</th>
+                <th>Nombre</th>
+                <th>Nivel</th>
+                <th>Alumnos</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.map((c) => (
+                <tr key={c.id}>
+                  <td className="text-slate-400">{c.id}</td>
+                  <td className="font-medium">{c.nombre}</td>
+                  <td>{c.nivel}</td>
+                  <td>{c.cantidadAlumnos ?? "?"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )
       )}
     </div>
   );
 }
 
 function NotasTab() {
-  const [alumnoIdLista, setAlumnoIdLista] = useState("1");
+  const [alumnos, setAlumnos] = useState<AlumnoDTO[]>([]);
+  const [asignaturas, setAsignaturas] = useState<AsignaturaDTO[]>([]);
+  const [alumnoIdLista, setAlumnoIdLista] = useState("");
   const [data, setData] = useState<EvaluacionDTO[]>([]);
   const [alumnoId, setAlumnoId] = useState("");
   const [asignaturaId, setAsignaturaId] = useState("");
@@ -249,13 +274,34 @@ function NotasTab() {
   const [ponderacion, setPonderacion] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    asistencia.listAlumnos().then((as) => {
+      setAlumnos(as);
+      if (as.length > 0) {
+        setAlumnoId(String(as[0].id));
+        setAlumnoIdLista(String(as[0].id));
+      }
+    }).catch((e) => setError((e as Error).message));
+    academica.listAsignaturas().then((ass) => {
+      setAsignaturas(ass);
+      if (ass.length > 0) setAsignaturaId(String(ass[0].id));
+    }).catch(() => { /* opcional */ });
+  }, []);
 
   async function buscar() {
+    if (!alumnoIdLista) return;
     setError(null);
+    setLoading(true);
     try {
       setData(await academica.notasAlumno(parseInt(alumnoIdLista, 10)));
+      setSearched(true);
     } catch (e: unknown) {
       setError((e as Error).message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -285,23 +331,23 @@ function NotasTab() {
       <h2>Registrar nota</h2>
       <form onSubmit={registrar} className="mb-3">
         <div className="row">
-          <div>
-            <label>Alumno ID</label>
-            <input
-              type="number"
-              value={alumnoId}
-              onChange={(e) => setAlumnoId(e.target.value)}
-              required
-            />
+          <div className="min-w-[160px]">
+            <label>Alumno</label>
+            <select className="w-full" value={alumnoId} onChange={(e) => setAlumnoId(e.target.value)} required>
+              {alumnos.length === 0 && <option value="">(sin alumnos)</option>}
+              {alumnos.map((a) => (
+                <option key={a.id} value={a.id}>{a.nombre}</option>
+              ))}
+            </select>
           </div>
-          <div>
-            <label>Asignatura ID</label>
-            <input
-              type="number"
-              value={asignaturaId}
-              onChange={(e) => setAsignaturaId(e.target.value)}
-              required
-            />
+          <div className="min-w-[160px]">
+            <label>Asignatura</label>
+            <select className="w-full" value={asignaturaId} onChange={(e) => setAsignaturaId(e.target.value)} required>
+              {asignaturas.length === 0 && <option value="">(sin asignaturas)</option>}
+              {asignaturas.map((a) => (
+                <option key={a.id} value={a.id}>{a.nombre}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label>Nombre evaluación</label>
@@ -336,22 +382,29 @@ function NotasTab() {
           </button>
         </div>
       </form>
-      <Box error={null} msg={msg} />
+      <Alert type="success" message={msg} onClose={() => setMsg(null)} />
       <hr />
       <h2>Notas por alumno</h2>
       <div className="row">
-        <div>
-          <label>Alumno ID</label>
-          <input value={alumnoIdLista} onChange={(e) => setAlumnoIdLista(e.target.value)} />
+        <div className="flex-1 min-w-[200px]">
+          <label>Alumno</label>
+          <select className="w-full" value={alumnoIdLista} onChange={(e) => setAlumnoIdLista(e.target.value)}>
+            {alumnos.length === 0 && <option value="">(sin alumnos)</option>}
+            {alumnos.map((a) => (
+              <option key={a.id} value={a.id}>{a.nombre} — {a.cursoNombre}</option>
+            ))}
+          </select>
         </div>
-        <button onClick={buscar} className="btn btn-secondary">
+        <button onClick={buscar} className="btn btn-secondary" disabled={!alumnoIdLista || loading}>
           Buscar
         </button>
       </div>
-      <Box error={error} msg={null} />
-      {data.length === 0 ? (
-        <p className="text-sm text-gray-600 mt-2">(sin notas)</p>
-      ) : (
+      <Alert type="error" message={error} onClose={() => setError(null)} />
+      {loading && <Spinner text="Cargando notas..." />}
+      {!loading && searched && data.length === 0 && (
+        <EmptyState emoji="📝" message="Sin notas registradas" />
+      )}
+      {!loading && data.length > 0 && (
         <table>
           <thead>
             <tr>
@@ -367,8 +420,8 @@ function NotasTab() {
               <tr key={n.id}>
                 <td>{n.fecha}</td>
                 <td>{n.asignaturaNombre}</td>
-                <td>{n.nombre}</td>
-                <td>{n.nota}</td>
+                <td className="font-medium">{n.nombre}</td>
+                <td><GradeBadge grade={n.nota} /></td>
                 <td>{n.ponderacion}</td>
               </tr>
             ))}
@@ -380,16 +433,29 @@ function NotasTab() {
 }
 
 function RendimientoTab() {
-  const [asignaturaId, setAsignaturaId] = useState("1");
+  const [asignaturas, setAsignaturas] = useState<AsignaturaDTO[]>([]);
+  const [asignaturaId, setAsignaturaId] = useState("");
   const [data, setData] = useState<RendimientoDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    academica.listAsignaturas().then((ass) => {
+      setAsignaturas(ass);
+      if (ass.length > 0) setAsignaturaId(String(ass[0].id));
+    }).catch((e) => setError((e as Error).message));
+  }, []);
 
   async function cargar() {
+    if (!asignaturaId) return;
     setError(null);
+    setLoading(true);
     try {
       setData(await academica.rendimiento(parseInt(asignaturaId, 10)));
     } catch (e: unknown) {
       setError((e as Error).message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -397,65 +463,58 @@ function RendimientoTab() {
     <div className="card">
       <h2>Rendimiento por asignatura</h2>
       <div className="row">
-        <div>
-          <label>Asignatura ID</label>
-          <input value={asignaturaId} onChange={(e) => setAsignaturaId(e.target.value)} />
+        <div className="flex-1 min-w-[200px]">
+          <label>Asignatura</label>
+          <select className="w-full" value={asignaturaId} onChange={(e) => setAsignaturaId(e.target.value)}>
+            {asignaturas.length === 0 && <option value="">(sin asignaturas)</option>}
+            {asignaturas.map((a) => (
+              <option key={a.id} value={a.id}>{a.nombre} — {a.cursoNombre}</option>
+            ))}
+          </select>
         </div>
-        <button onClick={cargar} className="btn btn-secondary">
+        <button onClick={cargar} className="btn btn-secondary" disabled={!asignaturaId || loading}>
           Cargar
         </button>
       </div>
-      <Box error={error} msg={null} />
-      {data && (
+      <Alert type="error" message={error} onClose={() => setError(null)} />
+      {loading && <Spinner text="Cargando rendimiento..." />}
+      {!loading && data && (
         <div className="mt-3">
           <h3>{data.asignaturaNombre}</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 my-3">
-            <div className="card">
+            <div className="card !p-4 border-l-4 border-l-violet-500">
               <div className="stat-label">Promedio del curso</div>
               <div className="stat-value">{data.promedioCurso}</div>
             </div>
-            <div className="card">
+            <div className="card !p-4 border-l-4 border-l-blue-500">
               <div className="stat-label">Cantidad de evaluaciones</div>
               <div className="stat-value">{data.cantidadEvaluaciones}</div>
             </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Alumno</th>
-                <th>Promedio</th>
-                <th># evals</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.alumnos.map((a) => (
-                <tr key={a.alumnoId}>
-                  <td>{a.alumnoNombre}</td>
-                  <td>{a.promedio}</td>
-                  <td>{a.cantidadEvaluaciones}</td>
+          {data.alumnos.length === 0 ? (
+            <EmptyState emoji="📈" message="Sin alumnos con evaluaciones" />
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Alumno</th>
+                  <th>Promedio</th>
+                  <th># evals</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.alumnos.map((a) => (
+                  <tr key={a.alumnoId}>
+                    <td className="font-medium">{a.alumnoNombre}</td>
+                    <td><GradeBadge grade={a.promedio} /></td>
+                    <td>{a.cantidadEvaluaciones}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
     </div>
-  );
-}
-
-function Box({ error, msg }: { error: string | null; msg: string | null }) {
-  return (
-    <>
-      {error && (
-        <p className="text-red-700 bg-red-100 border border-red-300 rounded px-2 py-1 mt-2 text-sm">
-          {error}
-        </p>
-      )}
-      {msg && (
-        <p className="text-green-700 bg-green-100 border border-green-300 rounded px-2 py-1 mt-2 text-sm">
-          {msg}
-        </p>
-      )}
-    </>
   );
 }
