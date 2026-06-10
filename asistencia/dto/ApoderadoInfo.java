@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApoderadoInfo {
+
     private Long id;
     private String nombre;
     private String email;

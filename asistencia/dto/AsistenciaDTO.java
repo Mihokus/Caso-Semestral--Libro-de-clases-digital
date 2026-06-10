@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AsistenciaDTO {
+
     private Long id;
     private Long alumnoId;
     private String alumnoNombre;
@@ -18,5 +19,6 @@ public class AsistenciaDTO {
     private String cursoNombre;
     private LocalDate fecha;
     private EstadoAsistencia estado;
+
     private RegistradoPor registradoPor;
 }

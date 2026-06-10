@@ -7,6 +7,7 @@ import lombok.Data;
 @Table(name = "apoderados")
 @Data
 public class Apoderado {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

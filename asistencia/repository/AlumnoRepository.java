@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AlumnoRepository extends JpaRepository<Alumno, Long> {
+
     Optional<Alumno> findByRut(String rut);
+
     List<Alumno> findByCursoId(Long cursoId);
 }

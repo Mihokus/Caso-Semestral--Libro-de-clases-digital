@@ -13,13 +13,12 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Anotacion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private Long alumnoId;
-
     private String alumnoNombre;
 
     @Enumerated(EnumType.STRING)

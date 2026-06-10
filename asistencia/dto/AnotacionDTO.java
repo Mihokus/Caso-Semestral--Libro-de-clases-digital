@@ -11,11 +11,13 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnotacionDTO {
+
     private Long id;
     private Long alumnoId;
     private String alumnoNombre;
     private TipoAnotacion tipo;
     private String descripcion;
     private Instant fecha;
+
     private RegistradoPor registradoPor;
 }

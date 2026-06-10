@@ -10,10 +10,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AlumnoDTO {
+
     private Long id;
     private String nombre;
     private String rut;
     private Long cursoId;
     private String cursoNombre;
+
     private List<ApoderadoInfo> apoderados;
 }

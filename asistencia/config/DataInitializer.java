@@ -15,11 +15,20 @@ import java.util.Set;
 public class DataInitializer {
 
     @Bean
-    public CommandLineRunner seedAsistencia(AlumnoRepository alumnoRepo, ApoderadoRepository apoderadoRepo) {
+    public CommandLineRunner seedData(
+            AlumnoRepository alumnoRepo,
+            ApoderadoRepository apoderadoRepo
+    ) {
         return args -> {
+
+            // Evitar duplicados
             if (alumnoRepo.count() > 0) return;
 
-            Apoderado apoderadoDemo = apoderadoRepo.findByEmail("apoderado@colegio.cl")
+            // =========================
+            // APODERADOS
+            // =========================
+
+            Apoderado apoderado1 = apoderadoRepo.findByEmail("apoderado@colegio.cl")
                     .orElseGet(() -> {
                         Apoderado a = new Apoderado();
                         a.setNombre("Apoderado Demo");
@@ -27,7 +36,7 @@ public class DataInitializer {
                         return apoderadoRepo.save(a);
                     });
 
-            Apoderado mariaSoto = apoderadoRepo.findByEmail("maria.soto@colegio.cl")
+            Apoderado apoderado2 = apoderadoRepo.findByEmail("maria.soto@colegio.cl")
                     .orElseGet(() -> {
                         Apoderado a = new Apoderado();
                         a.setNombre("María Soto");
@@ -35,26 +44,30 @@ public class DataInitializer {
                         return apoderadoRepo.save(a);
                     });
 
-            Set<Apoderado> apsDemo = new HashSet<>();
-            apsDemo.add(apoderadoDemo);
+            // =========================
+            // ALUMNOS
+            // =========================
+
+            Set<Apoderado> grupo1 = new HashSet<>();
+            grupo1.add(apoderado1);
 
             Alumno alumno1 = new Alumno();
             alumno1.setNombre("Estudiante Demo");
             alumno1.setRut("20.000.001-K");
             alumno1.setCursoId(1L);
             alumno1.setCursoNombre("1º Medio A");
-            alumno1.setApoderados(apsDemo);
+            alumno1.setApoderados(grupo1);
             alumnoRepo.save(alumno1);
 
-            Set<Apoderado> apsCarla = new HashSet<>();
-            apsCarla.add(mariaSoto);
+            Set<Apoderado> grupo2 = new HashSet<>();
+            grupo2.add(apoderado2);
 
             Alumno alumno2 = new Alumno();
             alumno2.setNombre("Carla González");
             alumno2.setRut("20.000.002-2");
             alumno2.setCursoId(1L);
             alumno2.setCursoNombre("1º Medio A");
-            alumno2.setApoderados(apsCarla);
+            alumno2.setApoderados(grupo2);
             alumnoRepo.save(alumno2);
 
             Alumno alumno3 = new Alumno();
@@ -62,7 +75,7 @@ public class DataInitializer {
             alumno3.setRut("20.000.003-4");
             alumno3.setCursoId(1L);
             alumno3.setCursoNombre("1º Medio A");
-            alumno3.setApoderados(apsDemo);
+            alumno3.setApoderados(grupo1);
             alumnoRepo.save(alumno3);
 
             Alumno alumno4 = new Alumno();

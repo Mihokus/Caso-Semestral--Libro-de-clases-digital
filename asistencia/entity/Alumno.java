@@ -10,11 +10,12 @@ import java.util.Set;
 @Table(name = "alumnos")
 @Data
 public class Alumno {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String rut;
 
     @Column(nullable = false)
