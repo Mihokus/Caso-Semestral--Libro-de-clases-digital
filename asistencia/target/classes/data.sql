@@ -1,2 +1,0 @@
-INSERT INTO alumnos (rut, nombre, curso_id, curso_nombre) VALUES ('11111111-1', 'Cristopher Barrueto', 1, 'Informatica');
-INSERT INTO alumnos (rut, nombre, curso_id, curso_nombre) VALUES ('22222222-2', 'Juan Perez', 2, 'Matematicas');
