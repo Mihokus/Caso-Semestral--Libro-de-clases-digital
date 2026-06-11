@@ -1,0 +1,163 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AsistenciaController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cl.colegio.ohiggins.asistencia.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: AsistenciaController (cl.colegio.ohiggins.asistencia.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AsistenciaController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cl.colegio.ohiggins.asistencia.controller;
+&nbsp;
+&nbsp;import cl.colegio.ohiggins.asistencia.dto.AsistenciaBulkRequest;
+&nbsp;import cl.colegio.ohiggins.asistencia.dto.AsistenciaDTO;
+&nbsp;import cl.colegio.ohiggins.asistencia.model.EstadoAsistencia;
+&nbsp;import cl.colegio.ohiggins.asistencia.strategy.asistencia.AsistenciaStrategy;
+&nbsp;import cl.colegio.ohiggins.asistencia.strategy.asistencia.AsistenciaStrategyFactory;
+&nbsp;import cl.colegio.ohiggins.asistencia.strategy.asistencia.AsistenciaContext;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/asistencia&quot;)
+<b class="fc">&nbsp;public class AsistenciaController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private AsistenciaStrategyFactory factory;
+&nbsp;
+&nbsp;    @PostMapping
+&nbsp;    public ResponseEntity&lt;List&lt;AsistenciaDTO&gt;&gt; registrar(@RequestBody AsistenciaBulkRequest req) {
+&nbsp;
+<b class="fc">&nbsp;        List&lt;AsistenciaDTO&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (AsistenciaBulkRequest.Entrada e : req.getAsistencias()) {</b>
+&nbsp;
+<b class="fc">&nbsp;            AsistenciaStrategy strategy = factory.get(e.getEstado());</b>
+&nbsp;
+<b class="fc">&nbsp;            AsistenciaContext ctx = new AsistenciaContext();</b>
+<b class="fc">&nbsp;            ctx.setAlumnoId(e.getAlumnoId());</b>
+<b class="fc">&nbsp;            ctx.setEstado(e.getEstado());</b>
+<b class="fc">&nbsp;            ctx.setFecha(req.getFecha());</b>
+<b class="fc">&nbsp;            ctx.setCursoId(req.getCursoId());</b>
+<b class="fc">&nbsp;            ctx.setRegistradoPorId(req.getRegistradoPorId());</b>
+<b class="fc">&nbsp;            ctx.setRegistradoPorNombre(req.getRegistradoPorNombre());</b>
+&nbsp;
+<b class="fc">&nbsp;            result.add(strategy.ejecutar(ctx));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return ResponseEntity.status(HttpStatus.CREATED).body(result);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-06-10 21:21</div>
+</div>
+</body>
+</html>

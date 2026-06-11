@@ -1,0 +1,159 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AusenteStrategy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cl.colegio.ohiggins.asistencia.strategy.asistencia</a>
+</div>
+
+<h1>Coverage Summary for Class: AusenteStrategy (cl.colegio.ohiggins.asistencia.strategy.asistencia)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AusenteStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cl.colegio.ohiggins.asistencia.strategy.asistencia;
+&nbsp;
+&nbsp;import cl.colegio.ohiggins.asistencia.dto.AsistenciaDTO;
+&nbsp;import cl.colegio.ohiggins.asistencia.model.Asistencia;
+&nbsp;import cl.colegio.ohiggins.asistencia.model.Anotacion;
+&nbsp;import cl.colegio.ohiggins.asistencia.model.TipoAnotacion;
+&nbsp;import cl.colegio.ohiggins.asistencia.repository.AsistenciaRepository;
+&nbsp;import cl.colegio.ohiggins.asistencia.repository.AnotacionRepository;
+&nbsp;import cl.colegio.ohiggins.asistencia.service.AsistenciaMapper;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;
+&nbsp;import java.time.Instant;
+&nbsp;
+&nbsp;@Component
+<b class="fc">&nbsp;public class AusenteStrategy implements AsistenciaStrategy {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private AsistenciaRepository asistenciaRepo;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private AnotacionRepository anotacionRepo;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private AsistenciaMapper mapper;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AsistenciaDTO ejecutar(AsistenciaContext context) {
+&nbsp;
+&nbsp;        // 1. guardar asistencia
+<b class="fc">&nbsp;        Asistencia a = new Asistencia();</b>
+<b class="fc">&nbsp;        a.setAlumnoId(context.getAlumnoId());</b>
+<b class="fc">&nbsp;        a.setCursoId(context.getCursoId());</b>
+<b class="fc">&nbsp;        a.setFecha(context.getFecha());</b>
+<b class="fc">&nbsp;        a.setEstado(context.getEstado());</b>
+<b class="fc">&nbsp;        a.setRegistradoPorId(context.getRegistradoPorId());</b>
+<b class="fc">&nbsp;        a.setRegistradoPorNombre(context.getRegistradoPorNombre());</b>
+&nbsp;
+<b class="fc">&nbsp;        Asistencia saved = asistenciaRepo.save(a);</b>
+&nbsp;
+&nbsp;        // 2. anotación automática por inasistencia
+<b class="fc">&nbsp;        Anotacion an = new Anotacion();</b>
+<b class="fc">&nbsp;        an.setAlumnoId(context.getAlumnoId());</b>
+<b class="fc">&nbsp;        an.setAlumnoNombre(null);</b>
+<b class="fc">&nbsp;        an.setTipo(TipoAnotacion.NEUTRAL);</b>
+<b class="fc">&nbsp;        an.setDescripcion(&quot;Inasistencia registrada automáticamente&quot;);</b>
+<b class="fc">&nbsp;        an.setFecha(Instant.now());</b>
+<b class="fc">&nbsp;        an.setRegistradoPorId(context.getRegistradoPorId());</b>
+<b class="fc">&nbsp;        an.setRegistradoPorNombre(&quot;Sistema&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        anotacionRepo.save(an);</b>
+&nbsp;
+<b class="fc">&nbsp;        return mapper.toAsistenciaDTO(saved);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-06-10 21:21</div>
+</div>
+</body>
+</html>
