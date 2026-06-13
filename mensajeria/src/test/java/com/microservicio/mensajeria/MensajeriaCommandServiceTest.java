@@ -8,21 +8,27 @@ import com.microservicio.mensajeria.model.TipoMensaje;
 import com.microservicio.mensajeria.repository.MensajeRepository;
 import com.microservicio.mensajeria.service.MensajeMapper;
 import com.microservicio.mensajeria.service.MensajeriaCommandService;
+import com.microservicio.mensajeria.strategy.MensajeDirectoStrategy;
+import com.microservicio.mensajeria.strategy.MensajeStrategyFactory;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class MensajeriaCommandServiceTest {
 
     private final MensajeRepository repository = mock(MensajeRepository.class);
     private final MensajeMapper mapper = new MensajeMapper();
-    private final MensajeriaCommandService service = new MensajeriaCommandService(repository, mapper);
+
+    private final MensajeStrategyFactory strategyFactory =
+            new MensajeStrategyFactory(List.of(new MensajeDirectoStrategy()));
+
+    private final MensajeriaCommandService service =
+            new MensajeriaCommandService(repository, mapper, strategyFactory);
 
     @Test
     void crearMensajeDirectoGuardaYRetornaDTO() {
