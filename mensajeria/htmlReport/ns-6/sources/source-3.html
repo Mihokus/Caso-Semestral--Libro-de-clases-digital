@@ -1,0 +1,160 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MensajeriaQueryService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.microservicio.mensajeria.service</a>
+</div>
+
+<h1>Coverage Summary for Class: MensajeriaQueryService (com.microservicio.mensajeria.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MensajeriaQueryService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (1/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (3/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.microservicio.mensajeria.service;
+&nbsp;
+&nbsp;import com.microservicio.mensajeria.dto.MensajeResponse;
+&nbsp;import com.microservicio.mensajeria.exception.ResourceNotFoundException;
+&nbsp;import com.microservicio.mensajeria.model.Mensaje;
+&nbsp;import com.microservicio.mensajeria.model.TipoMensaje;
+&nbsp;import com.microservicio.mensajeria.repository.MensajeRepository;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class MensajeriaQueryService {
+&nbsp;
+&nbsp;    private final MensajeRepository mensajeRepository;
+&nbsp;    private final MensajeMapper mapper;
+&nbsp;
+<b class="fc">&nbsp;    public MensajeriaQueryService(MensajeRepository mensajeRepository, MensajeMapper mapper) {</b>
+<b class="fc">&nbsp;        this.mensajeRepository = mensajeRepository;</b>
+<b class="fc">&nbsp;        this.mapper = mapper;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MensajeResponse obtenerPorId(Long id) {
+<b class="nc">&nbsp;        Mensaje m = mensajeRepository.findById(id)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Mensaje no encontrado con id: &quot; + id));</b>
+<b class="nc">&nbsp;        return mapper.toResponse(m);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;MensajeResponse&gt; obtenerPorRemitente(Long remitenteId) {
+<b class="nc">&nbsp;        return map(mensajeRepository.findByRemitenteIdOrderByFechaEnvioDesc(remitenteId));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;MensajeResponse&gt; obtenerInbox(Long userId) {
+<b class="nc">&nbsp;        return map(mensajeRepository</b>
+<b class="nc">&nbsp;                .findByDestinatarioIdOrTipoMensajeOrderByFechaEnvioDesc(userId, TipoMensaje.COMUNICADO));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;MensajeResponse&gt; map(List&lt;Mensaje&gt; list) {
+<b class="nc">&nbsp;        List&lt;MensajeResponse&gt; out = new ArrayList&lt;&gt;(list.size());</b>
+<b class="nc">&nbsp;        for (Mensaje m : list) out.add(mapper.toResponse(m));</b>
+<b class="nc">&nbsp;        return out;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-06-15 20:24</div>
+</div>
+</body>
+</html>
