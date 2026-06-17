@@ -2,11 +2,13 @@ package cl.duoc.academic.service;
 
 import cl.duoc.academic.dto.EvaluacionResponse;
 import cl.duoc.academic.model.Asignatura;
+import cl.duoc.academic.model.Curso;
+import cl.duoc.academic.dto.AsignaturaDTO;
+import cl.duoc.academic.dto.CursoDTO;
+import cl.duoc.academic.dto.CursoRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import cl.duoc.academic.dto.AsignaturaRequest;
 import cl.duoc.academic.dto.EvaluacionDTO;
-import cl.duoc.academic.dto.AsignaturaRequest;
 import cl.duoc.academic.model.Evaluacion;
 import cl.duoc.academic.repository.AsignaturaRepository;
 import cl.duoc.academic.repository.CursoRepository;
@@ -95,5 +97,73 @@ public class AcademicaCommandServiceTest {
 
         assertThrows(RuntimeException.class, () -> commandService.guardarAsignatura(req));
         verify(asigRepo, never()).save(any(Asignatura.class));
+    }
+    @Test
+    public void guardarCurso_creaElCursoYDevuelveElDto() {
+        CursoRequest req = new CursoRequest();
+        req.setNombre("3º Medio A");
+        req.setNivel("Educación Media");
+
+        when(cursoRepo.save(any(Curso.class))).thenAnswer(inv -> {
+            Curso c = inv.getArgument(0);
+            c.setId(5L);
+            return c;
+        });
+        when(queryService.toCursoDTO(any(Curso.class))).thenAnswer(inv -> {
+            Curso c = inv.getArgument(0);
+            return new CursoDTO(c.getId(), c.getNombre(), c.getNivel(), 0);
+        });
+
+        CursoDTO dto = commandService.guardarCurso(req);
+
+        assertEquals(5L, dto.getId());
+        assertEquals("3º Medio A", dto.getNombre());
+        verify(cursoRepo).save(any(Curso.class));
+    }
+
+    @Test
+    public void guardarAsignatura_asociaElCursoCuandoVieneCursoId() {
+        Curso curso = new Curso();
+        curso.setId(2L);
+        curso.setNombre("1º Medio B");
+
+        AsignaturaRequest req = new AsignaturaRequest();
+        req.setNombre("Historia");
+        req.setCursoId(2L);
+        req.setDocenteNombre("Pedro Rojas");
+
+        when(cursoRepo.findById(2L)).thenReturn(Optional.of(curso));
+        when(asigRepo.save(any(Asignatura.class))).thenAnswer(inv -> {
+            Asignatura a = inv.getArgument(0);
+            a.setId(3L);
+            return a;
+        });
+        when(queryService.toAsignaturaDTO(any(Asignatura.class))).thenAnswer(inv -> {
+            Asignatura a = inv.getArgument(0);
+            Long cursoId = a.getCurso() != null ? a.getCurso().getId() : null;
+            return new AsignaturaDTO(a.getId(), a.getNombreAsignatura(), cursoId,
+                    null, a.getDocenteId(), a.getDocenteNombre());
+        });
+
+        AsignaturaDTO dto = commandService.guardarAsignatura(req);
+
+        assertEquals(3L, dto.getId());
+        assertEquals(2L, dto.getCursoId());
+        assertEquals("Pedro Rojas", dto.getDocenteNombre());
+    }
+
+    @Test
+    public void guardarAsignatura_sinCursoIdNoConsultaElRepositorioDeCursos() {
+        AsignaturaRequest req = new AsignaturaRequest();
+        req.setNombre("Taller Electivo");
+
+        when(asigRepo.save(any(Asignatura.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(queryService.toAsignaturaDTO(any(Asignatura.class)))
+                .thenReturn(new AsignaturaDTO(null, "Taller Electivo", null, null, null, null));
+
+        AsignaturaDTO dto = commandService.guardarAsignatura(req);
+
+        assertEquals("Taller Electivo", dto.getNombre());
+        verify(cursoRepo, never()).findById(any());
     }
 }
