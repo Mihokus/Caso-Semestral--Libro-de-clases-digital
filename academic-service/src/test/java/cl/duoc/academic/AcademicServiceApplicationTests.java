@@ -10,4 +10,9 @@ class AcademicServiceApplicationTests {
 	void contextLoads() {
 	}
 
+	@Test
+	void mainMethodRunsWithoutException() {
+		AcademicServiceApplication.main(new String[]{});
+	}
+
 }
