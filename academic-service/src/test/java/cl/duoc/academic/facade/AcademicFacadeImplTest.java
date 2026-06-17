@@ -1,11 +1,12 @@
 package cl.duoc.academic.facade;
-
+import cl.duoc.academic.dto.AsignaturaDTO;
+import cl.duoc.academic.dto.AsignaturaRequest;
+import cl.duoc.academic.dto.CursoRequest;
+import cl.duoc.academic.dto.CursoDTO;
+import cl.duoc.academic.dto.EvaluacionDTO;
+import cl.duoc.academic.dto.EvaluacionResponse;
 import cl.duoc.academic.dto.RendimientoDTO;
-import cl.duoc.academic.model.Asignatura;
-import cl.duoc.academic.model.Evaluacion;
-import cl.duoc.academic.repository.AsignaturaRepository;
-import cl.duoc.academic.repository.CursoRepository;
-import cl.duoc.academic.repository.EvaluacionRepository;
+import cl.duoc.academic.service.AcademicaCommandService;
 import cl.duoc.academic.service.AcademicaQueryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,63 +14,119 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class AcademicFacadeImplTest {
 
-    @Mock private EvaluacionRepository evalRepo;
-    @Mock private CursoRepository cursoRepo;
-    @Mock private AsignaturaRepository asigRepo;
+    @Mock private AcademicaCommandService commandService;
+    @Mock private AcademicaQueryService queryService;
 
-    @InjectMocks private AcademicaQueryService queryService;
+    @InjectMocks private AcademicFacadeImpl facade;
 
     @Test
-    public void promedioCursoDePromedioDeNotasDelAsignatura() {
-        Long asignaturaId = 1L;
-        Asignatura asig = new Asignatura();
-        asig.setId(asignaturaId);
-        asig.setNombreAsignatura("Matemáticas");
+    public void registrarNota_delegaEnElServicioDeComandos() {
+        EvaluacionDTO dto = new EvaluacionDTO();
+        EvaluacionResponse esperado = new EvaluacionResponse();
+        esperado.setId(1L);
 
-        Evaluacion e1 = new Evaluacion();
-        e1.setAlumnoId(10L);
-        e1.setAlumnoNombre("Ana");
-        e1.setNota(6.0);
+        when(commandService.registrarNota(dto)).thenReturn(esperado);
 
-        Evaluacion e2 = new Evaluacion();
-        e2.setAlumnoId(11L);
-        e2.setAlumnoNombre("Bruno");
-        e2.setNota(4.0);
+        EvaluacionResponse resp = facade.registrarNota(dto);
 
-        when(asigRepo.findById(asignaturaId)).thenReturn(Optional.of(asig));
-        when(evalRepo.findByAsignaturaId(asignaturaId)).thenReturn(Arrays.asList(e1, e2));
-
-        RendimientoDTO rendimiento = queryService.obtenerRendimientoRico(asignaturaId);
-
-        assertEquals(5.0, rendimiento.getPromedioCurso(), 0.0001);
-        assertEquals(2, rendimiento.getCantidadEvaluaciones());
-        assertEquals(2, rendimiento.getAlumnos().size());
-        assertEquals("Matemáticas", rendimiento.getAsignaturaNombre());
+        assertSame(esperado, resp);
+        verify(commandService).registrarNota(dto);
     }
 
     @Test
-    public void rendimientoVacioDevuelveListaAlumnosVaciaNoNull() {
-        Long asignaturaId = 1L;
-        when(asigRepo.findById(asignaturaId)).thenReturn(Optional.empty());
-        when(evalRepo.findByAsignaturaId(asignaturaId)).thenReturn(Collections.emptyList());
+    public void obtenerRendimientoTotal_delegaEnElServicioDeConsultas() {
+        RendimientoDTO esperado = new RendimientoDTO(
+                1L, "Matemáticas", 5.5, 4, new ArrayList<>());
 
-        RendimientoDTO rendimiento = queryService.obtenerRendimientoRico(asignaturaId);
+        when(queryService.obtenerRendimientoRico(1L)).thenReturn(esperado);
 
-        assertNotNull(rendimiento.getAlumnos());
-        assertTrue(rendimiento.getAlumnos().isEmpty());
-        assertEquals(0, rendimiento.getCantidadEvaluaciones());
-        assertEquals(0.0, rendimiento.getPromedioCurso(), 0.0001);
+        RendimientoDTO resp = facade.obtenerRendimientoTotal(1L);
+
+        assertEquals("Matemáticas", resp.getAsignaturaNombre());
+        verify(queryService).obtenerRendimientoRico(1L);
+    }
+
+    @Test
+    public void listarCursos_delegaEnElServicioDeConsultas() {
+        List<CursoDTO> esperado = List.of(
+                new CursoDTO(1L, "1º Medio A", "Educación Media", 0));
+
+        when(queryService.listarCursos()).thenReturn(esperado);
+
+        assertEquals(1, facade.listarCursos().size());
+        verify(queryService).listarCursos();
+    }
+    @Test
+    public void guardarCurso_delegaEnElServicioDeComandos() {
+        CursoRequest req = new CursoRequest();
+        CursoDTO esperado = new CursoDTO(1L, "1º Medio A", "Educación Media", 0);
+
+        when(commandService.guardarCurso(req)).thenReturn(esperado);
+
+        assertSame(esperado, facade.guardarCurso(req));
+        verify(commandService).guardarCurso(req);
+    }
+
+    @Test
+    public void guardarAsignatura_delegaEnElServicioDeComandos() {
+        AsignaturaRequest req = new AsignaturaRequest();
+        AsignaturaDTO esperado = new AsignaturaDTO(1L, "Historia", null, null, null, null);
+
+        when(commandService.guardarAsignatura(req)).thenReturn(esperado);
+
+        assertSame(esperado, facade.guardarAsignatura(req));
+        verify(commandService).guardarAsignatura(req);
+    }
+
+    @Test
+    public void listarAsignaturas_delegaEnElServicioDeConsultas() {
+        List<AsignaturaDTO> esperado = List.of(
+                new AsignaturaDTO(1L, "Historia", null, null, null, null));
+
+        when(queryService.listarAsignaturas()).thenReturn(esperado);
+
+        assertEquals(1, facade.listarAsignaturas().size());
+        verify(queryService).listarAsignaturas();
+    }
+
+    @Test
+    public void obtenerAsignaturaPorId_delegaEnElServicioDeConsultas() {
+        AsignaturaDTO esperado = new AsignaturaDTO(1L, "Historia", null, null, null, null);
+
+        when(queryService.obtenerAsignaturaPorId(1L)).thenReturn(esperado);
+
+        assertSame(esperado, facade.obtenerAsignaturaPorId(1L));
+        verify(queryService).obtenerAsignaturaPorId(1L);
+    }
+
+    @Test
+    public void obtenerNotasAlumno_delegaEnElServicioDeConsultas() {
+        List<EvaluacionResponse> esperado = List.of(new EvaluacionResponse());
+
+        when(queryService.obtenerNotasAlumno(10L)).thenReturn(esperado);
+
+        assertEquals(1, facade.obtenerNotasAlumno(10L).size());
+        verify(queryService).obtenerNotasAlumno(10L);
+    }
+
+    @Test
+    public void obtenerCursoPorId_delegaEnElServicioDeConsultas() {
+        CursoDTO esperado = new CursoDTO(1L, "1º Medio A", "Educación Media", 0);
+
+        when(queryService.obtenerCursoPorId(1L)).thenReturn(esperado);
+
+        assertSame(esperado, facade.obtenerCursoPorId(1L));
+        verify(queryService).obtenerCursoPorId(1L);
     }
 }
