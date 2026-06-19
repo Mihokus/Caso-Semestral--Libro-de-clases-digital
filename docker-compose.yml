@@ -1,0 +1,136 @@
+# ============================================================================
+#  Libro de Clases Digital - Orquestacion completa con Docker Compose
+#
+#  Levanta TODO el sistema con un solo comando:
+#      docker compose up --build
+#
+#  Servicios y puertos (en el host):
+#      - Frontend (React)......... http://localhost:5173   <-- abrir aqui
+#      - API Gateway.............. http://localhost:8080
+#      - BFF...................... http://localhost:8085
+#      - MS Asistencia............ http://localhost:8081
+#      - MS Academico............. http://localhost:8084
+#      - MS Mensajeria............ http://localhost:8083
+#      - PostgreSQL............... interno (una instancia, 4 bases de datos)
+#
+#  Para detener:   docker compose down
+#  Borrar datos:   docker compose down -v
+# ============================================================================
+
+services:
+
+  # ---------- Base de datos (una instancia, 4 BD: Database per Service) ----------
+  db:
+    image: postgres:16
+    container_name: lcd-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: gateway_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gateway_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  # ---------- Microservicio: Asistencia ----------
+  asistencia:
+    build: ./asistencia
+    container_name: lcd-asistencia
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/asistencia
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8081:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---------- Microservicio: Academico ----------
+  academic-service:
+    build: ./academic-service
+    container_name: lcd-academic
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/academic_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8084:8084"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---------- Microservicio: Mensajeria ----------
+  mensajeria:
+    build: ./mensajeria
+    container_name: lcd-mensajeria
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mensajeria_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8083:8083"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---------- BFF (orquestador, sin base de datos) ----------
+  bff:
+    build: ./bff
+    container_name: lcd-bff
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      ASISTENCIA_URL: http://asistencia:8081
+      MENSAJERIA_URL: http://mensajeria:8083
+      ACADEMICA_URL: http://academic-service:8084
+    ports:
+      - "8085:8085"
+    depends_on:
+      - asistencia
+      - academic-service
+      - mensajeria
+    restart: unless-stopped
+
+  # ---------- API Gateway (puerta de entrada + JWT) ----------
+  api-gateway:
+    build: ./api-gateway
+    container_name: lcd-api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_URL: jdbc:postgresql://db:5432/gateway_db
+      DB_USER: postgres
+      DB_PASS: postgres
+      BFF_URL: http://bff:8085
+      JWT_SECRET: dev-secret-change-me-this-needs-to-be-at-least-32-bytes-long-for-hs256
+      JWT_EXPIRATION_MS: 86400000
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      bff:
+        condition: service_started
+    restart: unless-stopped
+
+  # ---------- Frontend (React + Vite) ----------
+  frontend:
+    build: ./frontend
+    container_name: lcd-frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+
+volumes:
+  pgdata:
