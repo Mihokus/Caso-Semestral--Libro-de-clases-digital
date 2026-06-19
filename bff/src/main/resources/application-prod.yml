@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 5000
+            read-timeout: 15000
+            logger-level: BASIC
+
+logging:
+  level:
+    com.libroclases: INFO
+    org.springframework: WARN

@@ -1,0 +1,229 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DataInitializer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cl.colegio.ohiggins.asistencia.config</a>
+</div>
+
+<h1>Coverage Summary for Class: DataInitializer (cl.colegio.ohiggins.asistencia.config)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DataInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6,5%
+  </span>
+  <span class="absValue">
+    (3/46)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DataInitializer$$SpringCGLIB$$0</td>
+  </tr>
+  <tr>
+    <td class="name">DataInitializer$$SpringCGLIB$$FastClass$$0</td>
+  </tr>
+  <tr>
+    <td class="name">DataInitializer$$SpringCGLIB$$FastClass$$1</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6,5%
+  </span>
+  <span class="absValue">
+    (3/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cl.colegio.ohiggins.asistencia.config;
+&nbsp;
+&nbsp;import cl.colegio.ohiggins.asistencia.entity.Alumno;
+&nbsp;import cl.colegio.ohiggins.asistencia.entity.Apoderado;
+&nbsp;import cl.colegio.ohiggins.asistencia.repository.AlumnoRepository;
+&nbsp;import cl.colegio.ohiggins.asistencia.repository.ApoderadoRepository;
+&nbsp;import org.springframework.boot.CommandLineRunner;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;@Configuration
+<b class="fc">&nbsp;public class DataInitializer {</b>
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public CommandLineRunner seedData(
+&nbsp;            AlumnoRepository alumnoRepo,
+&nbsp;            ApoderadoRepository apoderadoRepo
+&nbsp;    ) {
+<b class="fc">&nbsp;        return args -&gt; {</b>
+&nbsp;
+&nbsp;            // Evitar duplicados
+<b class="pc">&nbsp;            if (alumnoRepo.count() &gt; 0) return;</b>
+&nbsp;
+&nbsp;            // =========================
+&nbsp;            // APODERADOS
+&nbsp;            // =========================
+&nbsp;
+<b class="nc">&nbsp;            Apoderado apoderado1 = apoderadoRepo.findByEmail(&quot;apoderado@colegio.cl&quot;)</b>
+<b class="nc">&nbsp;                    .orElseGet(() -&gt; {</b>
+<b class="nc">&nbsp;                        Apoderado a = new Apoderado();</b>
+<b class="nc">&nbsp;                        a.setNombre(&quot;Apoderado Demo&quot;);</b>
+<b class="nc">&nbsp;                        a.setEmail(&quot;apoderado@colegio.cl&quot;);</b>
+<b class="nc">&nbsp;                        return apoderadoRepo.save(a);</b>
+&nbsp;                    });
+&nbsp;
+<b class="nc">&nbsp;            Apoderado apoderado2 = apoderadoRepo.findByEmail(&quot;maria.soto@colegio.cl&quot;)</b>
+<b class="nc">&nbsp;                    .orElseGet(() -&gt; {</b>
+<b class="nc">&nbsp;                        Apoderado a = new Apoderado();</b>
+<b class="nc">&nbsp;                        a.setNombre(&quot;María Soto&quot;);</b>
+<b class="nc">&nbsp;                        a.setEmail(&quot;maria.soto@colegio.cl&quot;);</b>
+<b class="nc">&nbsp;                        return apoderadoRepo.save(a);</b>
+&nbsp;                    });
+&nbsp;
+&nbsp;            // =========================
+&nbsp;            // ALUMNOS
+&nbsp;            // =========================
+&nbsp;
+<b class="nc">&nbsp;            Set&lt;Apoderado&gt; grupo1 = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;            grupo1.add(apoderado1);</b>
+&nbsp;
+<b class="nc">&nbsp;            Alumno alumno1 = new Alumno();</b>
+<b class="nc">&nbsp;            alumno1.setNombre(&quot;Estudiante Demo&quot;);</b>
+<b class="nc">&nbsp;            alumno1.setRut(&quot;20.000.001-K&quot;);</b>
+<b class="nc">&nbsp;            alumno1.setCursoId(1L);</b>
+<b class="nc">&nbsp;            alumno1.setCursoNombre(&quot;1º Medio A&quot;);</b>
+<b class="nc">&nbsp;            alumno1.setApoderados(grupo1);</b>
+<b class="nc">&nbsp;            alumnoRepo.save(alumno1);</b>
+&nbsp;
+<b class="nc">&nbsp;            Set&lt;Apoderado&gt; grupo2 = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;            grupo2.add(apoderado2);</b>
+&nbsp;
+<b class="nc">&nbsp;            Alumno alumno2 = new Alumno();</b>
+<b class="nc">&nbsp;            alumno2.setNombre(&quot;Carla González&quot;);</b>
+<b class="nc">&nbsp;            alumno2.setRut(&quot;20.000.002-2&quot;);</b>
+<b class="nc">&nbsp;            alumno2.setCursoId(1L);</b>
+<b class="nc">&nbsp;            alumno2.setCursoNombre(&quot;1º Medio A&quot;);</b>
+<b class="nc">&nbsp;            alumno2.setApoderados(grupo2);</b>
+<b class="nc">&nbsp;            alumnoRepo.save(alumno2);</b>
+&nbsp;
+<b class="nc">&nbsp;            Alumno alumno3 = new Alumno();</b>
+<b class="nc">&nbsp;            alumno3.setNombre(&quot;Diego Pérez&quot;);</b>
+<b class="nc">&nbsp;            alumno3.setRut(&quot;20.000.003-4&quot;);</b>
+<b class="nc">&nbsp;            alumno3.setCursoId(1L);</b>
+<b class="nc">&nbsp;            alumno3.setCursoNombre(&quot;1º Medio A&quot;);</b>
+<b class="nc">&nbsp;            alumno3.setApoderados(grupo1);</b>
+<b class="nc">&nbsp;            alumnoRepo.save(alumno3);</b>
+&nbsp;
+<b class="nc">&nbsp;            Alumno alumno4 = new Alumno();</b>
+<b class="nc">&nbsp;            alumno4.setNombre(&quot;Sofía Rojas&quot;);</b>
+<b class="nc">&nbsp;            alumno4.setRut(&quot;20.000.004-6&quot;);</b>
+<b class="nc">&nbsp;            alumno4.setCursoId(2L);</b>
+<b class="nc">&nbsp;            alumno4.setCursoNombre(&quot;2º Medio B&quot;);</b>
+<b class="nc">&nbsp;            alumnoRepo.save(alumno4);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-06-10 21:21</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+﻿# Compilados de Maven
+target/
+
+# Archivos de IDE
+.idea/
+*.iml
+.vscode/
+
+# Dependencias de frontend
+node_modules/

@@ -1,0 +1,23 @@
+server:
+  port: ${SERVER_PORT:8085}
+
+spring:
+  application:
+    name: bff
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+asistencia:
+  url: ${ASISTENCIA_URL:http://asistencia-app:8081}
+
+mensajeria:
+  url: ${MENSAJERIA_URL:http://mensajeria-app:8083}
+
+academica:
+  url: ${ACADEMICA_URL:http://academic-service:8084}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

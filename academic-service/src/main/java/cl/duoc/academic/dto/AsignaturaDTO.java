@@ -1,0 +1,17 @@
+package cl.duoc.academic.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AsignaturaDTO {
+    private Long id;
+    private String nombre;
+    private Long cursoId;
+    private String cursoNombre;
+    private Long docenteId;
+    private String docenteNombre;
+}
